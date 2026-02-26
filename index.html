@@ -1,0 +1,3518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Naari Fashion</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Josefin+Sans:wght@300;400;600;700&family=Rozha+One&family=Clicker+Script&display=swap" rel="stylesheet">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+/* ──────── RESET ──────── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --red:#ff3f6c;--red2:#d4244a;--ink:#1c1c1c;--ink2:#3e3e3e;
+  --gray:#f5f5f5;--gray2:#eaeaea;--border:#eaeaea;
+  --muted:#878787;--green:#03a685;--gold:#ff905a;--white:#fff;
+}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:#f5f5f5;color:var(--ink);font-size:14px}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+img{display:block;width:100%;height:100%;object-fit:cover}
+a{text-decoration:none;color:inherit}
+
+/* ──────── SHELL ──────── */
+#app{
+  height:100dvh;width:100%;max-width:430px;
+  margin:0 auto;background:#fff;
+  display:flex;flex-direction:column;overflow:hidden;
+  position:relative;box-shadow:0 0 30px rgba(0,0,0,0.12)
+}
+
+/* ──────── SCREENS ──────── */
+.scr{display:none;flex-direction:column;flex:1;overflow:hidden}
+.scr.on{display:flex}
+#scrAuth.on{overflow-y:auto;overflow-x:hidden;}
+
+/* ──────── AUTH ──────── */
+#scrAuth{
+  background: #0e0c0f;
+  position:relative;
+  overflow-y:auto;
+  overflow-x:hidden;
+  flex-direction:column;
+  align-items:center;
+}
+/* Animated background petals */
+#scrAuth::before{
+  content:'';
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(180,60,90,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 85% 20%, rgba(120,40,80,0.14) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 50% at 50% 90%, rgba(90,20,50,0.2) 0%, transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── BRAND HERO SECTION ── */
+.auth-hero{
+  position:relative;z-index:1;
+  width:100%;
+  display:flex;flex-direction:column;align-items:center;
+  padding:44px 24px 32px;
+  background:linear-gradient(170deg,#1a0d14 0%,#2a1020 50%,#1a0d14 100%);
+  border-bottom:1px solid rgba(212,100,120,0.2);
+}
+/* Decorative lines behind hero */
+.auth-hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(
+      -55deg,
+      transparent,transparent 38px,
+      rgba(180,60,90,0.04) 38px,rgba(180,60,90,0.04) 39px
+    );
+  pointer-events:none;
+}
+
+/* ── NAARI LOGO MARK ── */
+.naari-mark{
+  position:relative;
+  width:90px;height:90px;
+  margin-bottom:16px;
+}
+.naari-mark-ring{
+  width:90px;height:90px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#2a0e1a,#3d1628);
+  border:1.5px solid rgba(212,130,120,0.5);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:
+    0 0 0 5px rgba(180,60,90,0.08),
+    0 0 32px rgba(180,60,90,0.22),
+    inset 0 1px 0 rgba(255,200,180,0.1);
+  overflow:hidden;
+  animation:gentleSpin 18s linear infinite;
+}
+@keyframes gentleSpin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+.naari-mark-ring svg{
+  width:58px;height:58px;
+  filter:drop-shadow(0 2px 8px rgba(255,120,100,0.3));
+}
+/* Orbiting dot decoration */
+.naari-mark::after{
+  content:'';
+  position:absolute;
+  top:-4px;right:-4px;
+  width:16px;height:16px;
+  border-radius:50%;
+  background:radial-gradient(circle,#e8657a,#c0304a);
+  box-shadow:0 0 10px rgba(200,50,70,0.6);
+  animation:orbPulse 2.4s ease-in-out infinite;
+}
+@keyframes orbPulse{
+  0%,100%{transform:scale(1);opacity:1}
+  50%{transform:scale(1.3);opacity:0.7}
+}
+
+/* ── BRAND NAME TYPOGRAPHY ── */
+.naari-brand{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.naari-wordmark{
+  font-family:'Clicker Script',cursive;
+  font-weight:400;
+  font-style:normal;
+  font-size:3.2rem;
+  letter-spacing:2px;
+  color:#fff;
+  line-height:1;
+  text-shadow:0 2px 20px rgba(200,80,100,0.45);
+}
+.naari-wordmark span{
+  color:#f0c060;
+}
+.naari-tagline{
+  font-family:'Josefin Sans',sans-serif;
+  font-size:.58rem;
+  font-weight:300;
+  letter-spacing:6px;
+  text-transform:uppercase;
+  color:rgba(255,200,180,0.55);
+  margin-top:4px;
+}
+/* Divider ornament */
+.naari-ornament{
+  display:flex;align-items:center;gap:8px;margin-top:14px;
+}
+.naari-ornament::before,.naari-ornament::after{
+  content:'';flex:1;width:40px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,100,120,0.5),transparent);
+}
+.naari-ornament-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:#e8657a;
+  box-shadow:0 0 6px rgba(232,101,122,0.7);
+}
+
+/* ── AUTH TABS (Register / Login) ── */
+.auth-tabs{
+  position:relative;z-index:1;
+  display:flex;
+  width:100%;
+  background:#140910;
+  border-bottom:1px solid rgba(180,60,90,0.2);
+}
+.auth-tab{
+  flex:1;padding:14px 8px;
+  font-family:'Josefin Sans',sans-serif;
+  font-size:.72rem;font-weight:600;
+  letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(255,200,180,0.4);
+  border:none;background:none;cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .25s;
+  position:relative;
+}
+.auth-tab.on{
+  color:#f0a8b4;
+  border-bottom-color:#e8657a;
+}
+.auth-tab::after{
+  content:'';
+  position:absolute;bottom:-2px;left:50%;right:50%;
+  height:2px;background:#e8657a;
+  transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── AUTH CARDS ── */
+.auth-body{
+  position:relative;z-index:1;
+  width:100%;
+  padding:28px 22px 60px;
+  flex:1;
+  background:#0e0c0f;
+}
+.a-box{
+  display:none;
+  animation:fadeSlideUp .35s cubic-bezier(.4,0,.2,1);
+}
+.a-box.on{ display:block; }
+@keyframes fadeSlideUp{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.a-ttl{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.7rem;font-weight:500;font-style:italic;
+  color:#fff;
+  margin-bottom:3px;line-height:1.2;
+  text-shadow:0 1px 10px rgba(200,80,100,0.2);
+}
+.a-sub{
+  font-family:'Josefin Sans',sans-serif;
+  font-size:.65rem;font-weight:300;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,200,180,0.45);
+  margin-bottom:22px;
+}
+.fg{margin-bottom:14px}
+.fg label{
+  font-family:'Josefin Sans',sans-serif;
+  font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;
+  color:rgba(255,200,180,0.5);
+  display:block;margin-bottom:6px;
+}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:12px 14px;
+  border:1px solid rgba(180,60,90,0.3);
+  border-radius:6px;
+  font-size:.86rem;outline:none;
+  background:rgba(255,255,255,0.05);
+  color:#fff;
+  transition:border .2s,background .2s;
+  font-family:'DM Sans',sans-serif;
+}
+.fg input::placeholder{color:rgba(255,200,180,0.22)}
+.fg input:focus,.fg select:focus{
+  border-color:rgba(232,101,122,0.7);
+  background:rgba(255,255,255,0.08);
+  box-shadow:0 0 0 3px rgba(232,101,122,0.1);
+}
+.fg select{color:rgba(255,200,180,0.6)}
+.fg textarea{resize:none;color:#fff}
+.fg textarea::placeholder{color:rgba(255,200,180,0.22)}
+
+.btn-primary{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,#c0304a,#e8657a);
+  color:#fff;border:none;border-radius:6px;
+  font-family:'Josefin Sans',sans-serif;
+  font-size:.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;
+  box-shadow:0 4px 20px rgba(200,50,70,0.35);
+  transition:all .2s;
+  margin-top:4px;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#d4244a,#f07b8a);
+  box-shadow:0 6px 24px rgba(200,50,70,0.5);
+  transform:translateY(-1px);
+}
+.btn-black{
+  width:100%;padding:12px;
+  background:rgba(255,255,255,0.08);
+  color:rgba(255,200,180,0.7);
+  border:1px solid rgba(180,60,90,0.25);
+  border-radius:6px;
+  font-family:'Josefin Sans',sans-serif;
+  font-size:.72rem;font-weight:600;letter-spacing:1.5px;
+  cursor:pointer;margin-top:10px;
+  transition:all .2s;
+}
+.btn-black:hover{background:rgba(255,255,255,0.12)}
+.or-div{display:flex;align-items:center;gap:8px;margin:14px 0}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:rgba(180,60,90,0.25)}
+.or-div span{font-size:.65rem;color:rgba(255,200,180,0.35);font-family:'Josefin Sans',sans-serif;letter-spacing:1px}
+.a-sw{
+  text-align:center;margin-top:16px;
+  font-size:.75rem;color:rgba(255,200,180,0.4);
+  font-family:'Josefin Sans',sans-serif;
+}
+.a-sw b{color:#e8a0aa;cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+
+/* ──────── USER APP ──────── */
+#scrUser{flex-direction:column}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:200;
+  background:linear-gradient(135deg,#ff6b00 0%,#ff8c2a 50%,#ff6b00 100%);
+  border-bottom:none;
+  flex-shrink:0;
+  box-shadow:0 2px 8px rgba(255,107,0,0.4)
+}
+.loc-row{display:flex;align-items:center;gap:4px;padding:7px 14px 0;font-size:.72rem;color:rgba(255,255,255,0.9);cursor:pointer}
+.loc-row b{color:#fff;font-weight:700;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.loc-row .arr{color:rgba(255,255,255,0.8);font-size:.68rem;margin-left:2px}
+.sr-row{display:flex;align-items:center;padding:6px 10px 7px;gap:6px}
+.srch{flex:1;display:flex;align-items:center;background:#fff;border:none;border-radius:10px;padding:0 14px;gap:10px;height:42px;cursor:text;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.srch input{flex:1;border:none;background:transparent;outline:none;font-size:.88rem;color:#333;font-family:inherit}
+.srch input::placeholder{color:#aaa}
+.srch-chip{flex-shrink:0;padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;background:#fff;font-size:.78rem;cursor:pointer;font-family:inherit;font-weight:500;white-space:nowrap;transition:all .15s}
+.srch-chip.on{border-color:var(--red);background:var(--red);color:#fff;font-weight:600}
+.sugg-tag{padding:8px 14px;border:1.5px solid #eee;border-radius:20px;background:#fff;font-size:.82rem;cursor:pointer;font-family:inherit;font-weight:500;color:#333;transition:all .15s;white-space:nowrap}
+.sugg-tag:hover,.sugg-tag:active{border-color:var(--red);background:#fff5f7;color:var(--red)}
+.ti-wrap{position:relative}
+.ti{background:none;border:none;width:42px;height:42px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;flex-shrink:0;color:#fff}
+.ti svg{stroke:#fff}
+.tbadge{position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:50%;width:14px;height:14px;font-size:.48rem;display:flex;align-items:center;justify-content:center;font-weight:700;border:1.5px solid #fff}
+
+/* Profile Dropdown */
+.prof-dropdown{position:absolute;top:48px;right:0;background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.15);width:200px;display:none;z-index:500;overflow:hidden}
+.prof-dropdown.show{display:block}
+.pd-header{padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#fff5f7,#fff)}
+.pd-header span{font-size:.88rem;font-weight:700;color:var(--ink)}
+.pd-header p{font-size:.68rem;color:var(--muted);margin-top:2px}
+.pd-btn{display:flex;align-items:center;gap:10px;width:100%;padding:12px 16px;border:none;background:none;font-size:.82rem;color:var(--ink);cursor:pointer;text-align:left;transition:background .15s}
+.pd-btn:hover{background:var(--gray)}
+.pd-btn svg{flex-shrink:0;color:var(--muted)}
+.pd-divider{height:1px;background:var(--border);margin:4px 0}
+.pd-logout{color:var(--red)}
+.pd-logout svg{stroke:var(--red)}
+/* category tabs */
+.ctabs{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:#fff}
+.ctabs::-webkit-scrollbar{display:none}
+.ct{flex-shrink:0;padding:8px 16px;border:none;background:none;font-size:.8rem;font-weight:500;color:var(--muted);border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s}
+.ct.on{color:var(--red);border-bottom-color:var(--red);font-weight:700}
+.ct-more{flex-shrink:0;padding:8px 12px;border:none;background:none;cursor:pointer;display:flex;align-items:center}
+
+/* ── INNER PANEL (scrollable content area) ── */
+.panel{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.sub-panel{display:none;flex-direction:column}
+.sub-panel.on{display:flex}
+
+/* ── CIRCLE CATEGORIES ── */
+.circles{display:flex;overflow-x:auto;scrollbar-width:none;padding:14px 10px 10px;gap:14px;background:#fff}
+.circles::-webkit-scrollbar{display:none}
+.ci-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;flex-shrink:0}
+.ci-ring{width:70px;height:70px;border-radius:50%;overflow:hidden;border:2.5px solid var(--border);background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:1.8rem;transition:border-color .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.ci-ring img{width:100%;height:100%;object-fit:cover}
+.ci-item.on .ci-ring,.ci-item:hover .ci-ring{border-color:var(--red);box-shadow:0 2px 12px rgba(255,63,108,.25)}
+.ci-lbl{font-size:.66rem;color:var(--ink);font-weight:500;text-align:center;white-space:nowrap}
+.ci-item.on .ci-lbl{color:var(--red);font-weight:700}
+
+/* ── BANNER SLIDER — purple border like Myntra ── */
+.ban-outer{
+  margin:10px 10px 4px;
+  border-radius:22px;
+  overflow:hidden;
+  border:4px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,
+             linear-gradient(135deg,#ff6b00,#ffb347,#ff6b00) border-box;
+  box-shadow:0 8px 30px rgba(255,107,0,0.5), 0 2px 10px rgba(255,107,0,0.25);
+}
+.ban-inner{position:relative;overflow:hidden;border-radius:18px;background:var(--gray)}
+.ban-track{display:flex;transition:transform .55s cubic-bezier(.4,0,.2,1);will-change:transform}
+.ban-slide{min-width:100%;position:relative;overflow:hidden;background:var(--gray)}
+.ban-slide-img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.ban-slide .fallback{width:100%;aspect-ratio:4/3;display:flex;align-items:flex-end;padding:24px 20px}
+.ban-slide .fallbg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:130px}
+.ban-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.68) 0%,transparent 50%);display:flex;align-items:flex-end;padding:22px 20px;justify-content:space-between}
+.ban-txt h3{font-size:1.55rem;font-weight:900;color:#fff;text-transform:uppercase;line-height:1.1;letter-spacing:.3px;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.ban-txt p{font-size:.88rem;color:rgba(255,255,255,.92);margin-top:4px;font-weight:500}
+.ban-brands{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.ban-bc{background:rgba(255,255,255,.22);backdrop-filter:blur(4px);color:#fff;font-size:.68rem;padding:5px 12px;border-radius:5px;font-weight:700;border:1px solid rgba(255,255,255,.35)}
+.ban-cta{background:#fff;color:var(--ink);font-size:.82rem;font-weight:800;padding:11px 20px;border:none;border-radius:25px;cursor:pointer;white-space:nowrap;align-self:flex-end;display:flex;align-items:center;gap:6px;flex-shrink:0;box-shadow:0 3px 14px rgba(0,0,0,.22)}
+.ban-cta .arr{font-size:.85rem}
+.ban-dots-row{display:flex;justify-content:center;gap:4px;padding:6px 0 3px;background:#fff}
+.bdot{width:6px;height:6px;border-radius:50%;background:var(--gray2);border:none;cursor:pointer;transition:all .28s}
+.bdot.on{background:var(--red);width:18px;border-radius:3px}
+/* Brand co-powered strip */
+.brand-strip{
+  display:flex;align-items:center;justify-content:space-around;
+  padding:10px 12px;
+  margin:0 10px 6px;
+  background:#fff;
+  border-radius:12px;
+  border:2px solid transparent;
+  background-image:linear-gradient(#fff,#fff),linear-gradient(135deg,#ff6b00,#ff9800,#ff6b00);
+  background-origin:padding-box,border-box;
+  background-clip:padding-box,border-box;
+  overflow-x:auto;scrollbar-width:none;gap:4px;
+  box-shadow:0 2px 10px rgba(255,107,0,0.18);
+}
+.brand-strip::-webkit-scrollbar{display:none}
+.brand-strip-item{flex:1;text-align:center;font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;line-height:1.4;cursor:pointer;white-space:nowrap;padding:0 4px}
+.brand-strip-item b{display:block;font-size:.64rem;color:var(--ink);font-weight:800}
+.brand-strip-sep{color:var(--border);font-size:.9rem;flex-shrink:0}
+
+/* ── PROMO STRIP ── */
+.promo{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--gray);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:6px}
+.promo-ico{width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,#ff6b35,#f7931e);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;color:#fff}
+.promo-txt{flex:1;font-size:.72rem;color:var(--ink);line-height:1.4}
+.promo-btn{background:var(--red);color:#fff;font-size:.64rem;font-weight:700;padding:5px 9px;border:none;border-radius:4px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;gap:2px}
+/* BHIM offer strip */
+.bhim-strip{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  margin:0 10px 6px;
+  background:#fff;
+  border-radius:12px;
+  border:2px solid transparent;
+  background-image:linear-gradient(#fff,#fff),linear-gradient(135deg,#ff6b00,#ff9800,#ff6b00);
+  background-origin:padding-box,border-box;
+  background-clip:padding-box,border-box;
+  box-shadow:0 2px 10px rgba(255,107,0,0.15);
+}
+.bhim-logo{background:linear-gradient(135deg,#2196f3,#0d47a1);color:#fff;font-size:.65rem;font-weight:900;padding:4px 8px;border-radius:6px;letter-spacing:.5px;flex-shrink:0}
+.bhim-txt{flex:1;font-size:.72rem;color:var(--ink);line-height:1.4}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;justify-content:space-between;align-items:baseline;padding:12px 12px 7px}
+.sh h2{font-size:.95rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+.sh h2 span{color:var(--red)}
+.sh a{font-size:.72rem;color:var(--muted);cursor:pointer;text-decoration:underline}
+
+/* ── BRAND CARDS 2-col ── */
+.brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 8px 10px}
+.bc{border-radius:10px;overflow:hidden;border:1px solid var(--border);cursor:pointer;background:var(--gray)}
+.bc-img{width:100%;aspect-ratio:1/1;overflow:hidden;background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:3.5rem}
+.bc-img img{width:100%;height:100%;object-fit:cover}
+.bc-body{padding:8px 9px 10px}
+.bc-title{font-size:.72rem;font-weight:700;color:var(--ink)}
+.bc-sub{font-size:.62rem;color:var(--muted);margin-top:2px;line-height:1.3}
+.bc-brand{display:flex;align-items:center;gap:4px;margin-top:5px;font-size:.62rem;font-weight:600;color:var(--muted)}
+
+/* ── PRODUCT GRID ── */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.pcard{background:#fff;cursor:pointer;display:flex;flex-direction:column}
+.pcard-img{position:relative;overflow:hidden;aspect-ratio:.75;background:var(--gray);flex-shrink:0}
+.pcard-img img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.pcard:hover .pcard-img img{transform:scale(1.04)}
+.pfall{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:4.5rem;background:linear-gradient(135deg,#fce8ec,#fef0e8)}
+.pbadges{position:absolute;top:6px;left:6px;display:flex;flex-direction:column;gap:3px}
+.pb{font-size:.55rem;font-weight:700;padding:2px 6px;border-radius:3px}
+.pb-sale{background:var(--red);color:#fff}
+.pb-new{background:var(--ink);color:#fff}
+.pb-low{background:var(--gold);color:#fff}
+.pwish{position:absolute;top:6px;right:6px;background:rgba(255,255,255,.88);border:none;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.82rem;cursor:pointer;backdrop-filter:blur(3px)}
+.pinfo{padding:8px 8px 11px}
+.p-brand{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+.p-name{font-size:.78rem;color:var(--ink);margin:2px 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400}
+.p-price{display:flex;align-items:baseline;gap:4px;flex-wrap:wrap}
+.p-sp{font-size:.86rem;font-weight:700}
+.p-mrp{font-size:.68rem;color:var(--muted);text-decoration:line-through}
+.p-off{font-size:.66rem;color:var(--red);font-weight:600}
+.p-rat{display:flex;align-items:center;gap:3px;margin-top:4px}
+.rat-chip{background:#f0faf6;border:1px solid #b8e2d1;border-radius:3px;padding:2px 5px;font-size:.6rem;font-weight:600;color:var(--green)}
+
+/* ── PRODUCT DETAIL ── */
+.dh{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 10px;height:46px;gap:8px;flex-shrink:0}
+.dh .back{background:none;border:none;font-size:1.1rem;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.dh .dh-ttl{flex:1;font-size:.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d-slider{position:relative;background:var(--gray);flex-shrink:0}
+.d-track{display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.d-slide{min-width:100%;aspect-ratio:.78;overflow:hidden;background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:8rem}
+.d-slide img{width:100%;height:100%;object-fit:cover}
+.d-arrows{position:absolute;top:50%;transform:translateY(-50%);width:100%;display:flex;justify-content:space-between;padding:0 8px;pointer-events:none}
+.d-arr{pointer-events:all;background:rgba(255,255,255,.85);border:none;border-radius:50%;width:28px;height:28px;font-size:.88rem;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.15)}
+.d-thumbs{display:flex;gap:6px;padding:8px 10px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);flex-shrink:0}
+.d-thumbs::-webkit-scrollbar{display:none}
+.dthumb{width:48px;height:60px;border-radius:5px;overflow:hidden;border:2px solid transparent;cursor:pointer;flex-shrink:0;background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.dthumb.on{border-color:var(--red)}
+.dthumb img{width:100%;height:100%;object-fit:cover}
+.d-body{padding:12px 12px;overflow-y:visible}
+.d-brand{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.d-name{font-size:1rem;font-weight:500;margin:3px 0 7px;line-height:1.3}
+.d-price-row{display:flex;align-items:baseline;gap:7px;margin-bottom:13px}
+.d-sp{font-size:1.15rem;font-weight:700}
+.d-mrp{font-size:.84rem;color:var(--muted);text-decoration:line-through}
+.d-off{font-size:.78rem;color:var(--red);font-weight:700}
+.size-hd{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:7px}
+.size-hd span{color:var(--red);font-weight:500;cursor:pointer}
+.sizes{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.sz{min-width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.73rem;font-weight:600;cursor:pointer;padding:0 5px;transition:all .15s}
+.sz:hover{border-color:var(--ink)}
+.sz.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.d-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:11px}
+.dtb{flex:1;padding:9px 4px;text-align:center;font-size:.73rem;font-weight:500;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;transition:all .15s}
+.dtb.on{color:var(--ink);border-bottom-color:var(--ink);font-weight:700}
+.dpane{display:none;font-size:.8rem;color:var(--muted);line-height:1.75}
+.dpane.on{display:block}
+.rv{background:var(--gray);border-radius:9px;padding:10px 11px;margin-bottom:7px}
+.rv-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.rv-name{font-weight:700;font-size:.78rem;color:var(--ink)}
+.d-sticky{background:#fff;border-top:1px solid var(--border);display:flex;gap:8px;padding:9px 10px;flex-shrink:0;position:sticky;bottom:0;z-index:100}
+.dwish{width:42px;height:42px;border-radius:7px;border:1.5px solid var(--border);background:none;font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s}
+.dwish.on{border-color:var(--red);background:#fff5f8}
+.btn-cart-d{flex:1;height:42px;background:var(--red);color:#fff;border:none;border-radius:7px;font-size:.82rem;font-weight:700;cursor:pointer}
+.btn-buy-d{flex:1;height:42px;background:var(--ink);color:#fff;border:none;border-radius:7px;font-size:.82rem;font-weight:700;cursor:pointer}
+
+/* ── CART ── */
+.cart-hd{display:flex;align-items:center;padding:0 10px;height:46px;border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;background:#fff;z-index:50}
+.cart-hd .back{background:none;border:none;font-size:1.1rem;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cart-hd span{font-weight:700;font-size:.9rem}
+.cart-item{display:flex;gap:10px;padding:12px 10px;border-bottom:1px solid var(--border)}
+.ci-img{width:76px;height:93px;border-radius:7px;overflow:hidden;flex-shrink:0;background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:2rem}
+.ci-img img{width:100%;height:100%;object-fit:cover}
+.ci-info{flex:1}
+.ci-brand{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+.ci-name{font-size:.8rem;font-weight:500;margin:2px 0 3px;color:var(--ink)}
+.ci-size{font-size:.7rem;color:var(--muted)}
+.ci-price{font-size:.88rem;font-weight:700;margin:6px 0 8px}
+.qty{display:flex;align-items:center;gap:8px}
+.qb{width:26px;height:26px;border-radius:6px;border:1.5px solid var(--border);background:#fff;font-size:.9rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:border .15s}
+.qb:hover{border-color:var(--ink)}
+.qn{font-size:.85rem;font-weight:600;min-width:16px;text-align:center}
+.c-del{background:none;border:none;color:var(--muted);font-size:.7rem;text-decoration:underline;margin-left:auto;cursor:pointer;align-self:flex-start}
+.cart-sum{background:var(--gray);border-radius:10px;margin:8px 10px;padding:12px}
+.sr{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-bottom:6px}
+.sr.tot{font-weight:700;font-size:.94rem;color:var(--ink);border-top:1px dashed var(--border);padding-top:7px;margin-top:4px}
+.coup-row{display:flex;gap:7px;margin:0 10px 8px}
+.coup-row input{flex:1;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:.8rem;outline:none}
+.coup-row input:focus{border-color:var(--red)}
+.apply-btn{padding:9px 14px;background:var(--red);color:#fff;border:none;border-radius:7px;font-size:.76rem;font-weight:700;cursor:pointer}
+.coup-msg{font-size:.7rem;padding:0 10px 6px}
+
+/* ── CHECKOUT ── */
+.ck-card{margin:10px;border:1px solid var(--border);border-radius:11px;overflow:hidden}
+.ck-hd{padding:11px 13px;border-bottom:1px solid var(--border);font-weight:700;font-size:.85rem}
+.ck-body{padding:13px}
+.pay-opt{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1.5px solid var(--border);border-radius:8px;margin-bottom:7px;cursor:pointer;transition:all .15s}
+.pay-opt.on{border-color:var(--red);background:#fff5f8}
+.pay-ico{font-size:1.3rem;width:32px;text-align:center}
+.pay-n{font-weight:700;font-size:.82rem}
+.pay-s{font-size:.68rem;color:var(--muted)}
+.pay-radio{margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0}
+.pay-opt.on .pay-radio{border-color:var(--red);background:var(--red);display:flex;align-items:center;justify-content:center}
+.pay-opt.on .pay-radio::after{content:'';width:5px;height:5px;border-radius:50%;background:#fff;display:block}
+
+/* ── ORDERS ── */
+.o-card{margin:10px;border:1px solid var(--border);border-radius:11px;overflow:hidden}
+.o-hd{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.o-num{font-weight:700;font-size:.82rem}
+.o-date{font-size:.67rem;color:var(--muted);margin-top:2px}
+.ostatus{padding:3px 9px;border-radius:20px;font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.s-p{background:#fff3e0;color:#e65100}
+.s-pr{background:#e3f2fd;color:#1565c0}
+.s-sh{background:#f3e5f5;color:#6a1b9a}
+.s-de{background:#e8f5e9;color:#1b5e20}
+.o-items{padding:10px 12px;border-bottom:1px solid var(--border)}
+.oi-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.oi-img{width:44px;height:56px;border-radius:5px;overflow:hidden;flex-shrink:0;background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.oi-img img{width:100%;height:100%;object-fit:cover}
+.oi-n{font-size:.76rem;font-weight:600}
+.oi-s{font-size:.66rem;color:var(--muted);margin-top:1px}
+.track{padding:12px}
+.track-lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:9px}
+.track-row{display:flex;position:relative}
+.track-row::before{content:'';position:absolute;top:9px;left:9px;right:9px;height:2px;background:var(--border)}
+.track-fill{position:absolute;top:9px;left:9px;height:2px;background:var(--green);transition:width .5s}
+.ts{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;z-index:1}
+.td{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.45rem;transition:all .3s}
+.td.done{background:var(--green);border-color:var(--green);color:#fff}
+.td.cur{background:var(--red);border-color:var(--red);color:#fff}
+.tl{font-size:.53rem;color:var(--muted);text-align:center;font-weight:500}
+
+/* ── WISHLIST & PROFILE ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;flex:1;text-align:center}
+.empty-ico{font-size:3.5rem;margin-bottom:10px;opacity:.3}
+.empty-t{font-size:.85rem;color:var(--muted);margin-bottom:16px}
+.btn-outline{padding:10px 26px;border:1.5px solid var(--ink);border-radius:30px;background:none;font-size:.8rem;font-weight:600;cursor:pointer}
+
+/* Myntra-style Profile */
+.prof-hd{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);background:#fff;position:sticky;top:0;z-index:50}
+.prof-hd .back{background:none;border:none;font-size:1.1rem;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.prof-hd-ttl{font-size:.92rem;font-weight:600;color:var(--ink)}
+.prof-hd-right{margin-left:auto;display:flex;align-items:center;gap:4px;color:var(--green);font-size:.82rem;font-weight:700}
+.prof-hd-right svg{width:18px;height:18px}
+
+/* Sale Banner */
+.prof-sale{margin:12px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#6b5ce7 0%,#8b7cf7 50%,#a78bfa 100%);padding:16px 18px;position:relative}
+.prof-sale::before{content:'✨';position:absolute;top:8px;left:12px;font-size:1.2rem;opacity:.6}
+.prof-sale::after{content:'🎉';position:absolute;bottom:8px;right:12px;font-size:1.2rem;opacity:.6}
+.prof-sale h3{color:#ffd700;font-size:1.1rem;font-weight:800;font-style:italic;text-shadow:1px 1px 2px rgba(0,0,0,.2)}
+.prof-sale p{color:#fff;font-size:.78rem;margin-top:4px;font-weight:600}
+.prof-sale .sale-off{font-size:1.5rem;font-weight:900;color:#fff;margin-top:6px}
+
+/* Quick Actions Grid */
+.prof-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px}
+.pa-btn{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s}
+.pa-btn:hover{border-color:var(--red);background:#fff8f9}
+.pa-btn svg{width:22px;height:22px;color:var(--ink);flex-shrink:0}
+.pa-btn span{font-size:.82rem;font-weight:600;color:var(--ink)}
+.pa-btn .arr{margin-left:auto;color:var(--muted);font-size:.8rem}
+
+/* Menu Items - Myntra Style */
+.prof-menu{background:#fff;margin:0 12px 12px;border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.pm2{display:flex;align-items:center;padding:14px 14px;border-bottom:1px solid var(--border);gap:12px;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left;cursor:pointer;transition:background .15s}
+.pm2:last-child{border-bottom:none}
+.pm2:hover{background:#fafafa}
+.pm2-ico{width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pm2-ico svg{width:20px;height:20px;color:var(--ink)}
+.pm2-txt{flex:1}
+.pm2-t{font-size:.88rem;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:6px}
+.pm2-s{font-size:.7rem;color:var(--muted);margin-top:2px}
+.pm2-arr{color:var(--muted)}
+.pm2-arr svg{width:16px;height:16px}
+.pm2-new{background:var(--red);color:#fff;font-size:.55rem;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase}
+.pm2-expand svg{width:18px;height:18px;color:var(--muted);transition:transform .2s}
+
+/* Footer Links */
+.prof-footer{padding:16px 12px;background:var(--gray)}
+.pf-link{display:block;padding:8px 0;font-size:.76rem;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+
+/* Logout Button */
+.prof-logout{margin:16px 12px 24px;padding:14px;border:1.5px solid var(--red);border-radius:8px;background:#fff;color:var(--red);font-size:.9rem;font-weight:700;cursor:pointer;text-align:center;transition:all .15s}
+.prof-logout:hover{background:var(--red);color:#fff}
+
+/* ── BOTTOM NAV ── */
+.bnav{background:#fff;border-top:1px solid var(--border);display:flex;flex-shrink:0;z-index:150;padding:4px 0 2px}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0;border:none;background:none;cursor:pointer;gap:2px;color:var(--muted);transition:color .15s}
+.bn.on{color:var(--red)}
+.bn.on svg{stroke:var(--red)}
+.bn .ico{font-size:1.1rem;height:24px;display:flex;align-items:center;justify-content:center}
+.bn .ico svg{stroke:var(--ink)}
+.bn.on .ico svg{stroke:var(--red)}
+.bn .lbl{font-size:.58rem;font-weight:500;margin-top:1px}
+.bn-badge{position:absolute;top:-4px;right:-8px;background:var(--red);color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:.52rem;display:flex;align-items:center;justify-content:center;font-weight:700;padding:0 4px}
+
+/* ── FILTER SHEET ── */
+.filter-sheet{position:fixed;inset:0;z-index:900;pointer-events:none}
+.filter-sheet.open{pointer-events:all}
+.filter-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);opacity:0;transition:opacity .3s}
+.filter-sheet.open .filter-backdrop{opacity:1}
+.filter-panel{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:80vh;overflow:hidden;display:flex;flex-direction:column;max-width:430px;margin:0 auto}
+.filter-sheet.open .filter-panel{transform:translateY(0)}
+.filter-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem;flex-shrink:0}
+.filter-body{overflow-y:auto;padding:16px 18px 8px}
+.filter-lbl{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px}
+.price-chips{display:flex;flex-wrap:wrap;gap:8px}
+.pchip{padding:8px 14px;border:1.5px solid var(--border);border-radius:22px;background:#fff;font-size:.8rem;cursor:pointer;transition:all .15s;font-family:inherit;font-weight:500}
+.pchip.on{border-color:var(--red);background:var(--red);color:#fff}
+
+/* ── WALLET ── */
+.wallet-amt-btn{padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:.8rem;cursor:pointer;transition:all .15s;font-family:inherit}
+.wallet-amt-btn.on{border-color:var(--red);background:#fff5f7;color:var(--red);font-weight:700}
+
+/* ── SUPPORT CHAT — WhatsApp Style ── */
+.supp-hd{
+  background:var(--red);
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px 10px;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
+}
+.supp-back{background:none;border:none;cursor:pointer;color:#fff;padding:2px;display:flex;align-items:center}
+.supp-avatar{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;font-weight:800;color:#fff;flex-shrink:0;
+}
+.supp-hd-info{flex:1}
+.supp-name{font-size:.9rem;font-weight:700;color:#fff}
+.supp-status{font-size:.68rem;color:rgba(255,255,255,.8)}
+
+.supp-input-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px 14px;background:transparent;flex-shrink:0;
+}
+.supp-attach-btn{
+  width:44px;height:44px;border-radius:50%;
+  background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;color:#555;
+  box-shadow:0 1px 4px rgba(0,0,0,.15);
+}
+.supp-input-wrap{
+  flex:1;background:#fff;border-radius:22px;
+  padding:10px 16px;
+  box-shadow:0 1px 4px rgba(0,0,0,.12);
+  min-height:44px;display:flex;align-items:center;
+}
+.supp-send-btn{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--red);border:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(255,63,108,.4);
+}
+
+/* Chat bubbles */
+.chat-bubble{max-width:80%;display:flex;flex-direction:column;gap:2px}
+.user-bubble{align-self:flex-end;align-items:flex-end}
+.admin-bubble{align-self:flex-start;align-items:flex-start}
+.chat-txt{
+  padding:9px 13px;
+  font-size:.87rem;line-height:1.5;word-break:break-word;
+  position:relative;
+}
+.user-bubble .chat-txt{
+  background:#dcf8c6;color:#111;
+  border-radius:16px 16px 4px 16px;
+  box-shadow:0 1px 3px rgba(0,0,0,.1);
+}
+.admin-bubble .chat-txt{
+  background:#fff;color:#111;
+  border-radius:16px 16px 16px 4px;
+  box-shadow:0 1px 3px rgba(0,0,0,.1);
+}
+.chat-time{font-size:.6rem;color:rgba(0,0,0,.4);padding:0 4px;margin-top:1px}
+.chat-img{max-width:220px;border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.chat-img img{width:100%;height:auto;display:block;border-radius:12px}
+.chat-file-msg{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(0,0,0,.05);border-radius:8px}
+.chat-img-preview{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.chat-img-preview img{max-width:96%;max-height:80vh;object-fit:contain;border-radius:8px}
+.chat-img-preview button{margin-top:16px;padding:10px 24px;background:#fff;border:none;border-radius:22px;font-weight:700;cursor:pointer;font-size:.9rem}
+
+/* Admin chat */
+.adm-chat-box{height:340px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#ece5dd}
+.adm-chat-input{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);background:#fff}
+.adm-chat-input input{flex:1;border:1.5px solid var(--border);border-radius:22px;padding:8px 14px;font-size:.82rem;outline:none;font-family:inherit}
+.adm-chat-input button{padding:8px 16px;background:var(--red);color:#fff;border:none;border-radius:22px;font-weight:700;cursor:pointer;font-size:.78rem}
+
+/* Admin chat */
+.adm-chat-box{height:340px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f8f8f8}
+.adm-chat-input{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);background:#fff}
+.adm-chat-input input{flex:1;border:1.5px solid var(--border);border-radius:22px;padding:8px 14px;font-size:.82rem;outline:none;font-family:inherit}
+.adm-chat-input button{padding:8px 16px;background:var(--gold);color:#000;border:none;border-radius:22px;font-weight:700;cursor:pointer;font-size:.78rem}
+
+/* Birthday Blast Color Picker */
+.blast-color{padding:6px 14px;border:2px solid transparent;border-radius:20px;color:#fff;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
+.blast-color.on{border-color:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.2)}
+
+/* ── ADMIN ── */
+#scrAdmin{flex-direction:column}
+.adm-top{background:var(--ink);padding:0 12px;display:flex;align-items:center;justify-content:space-between;height:50px;flex-shrink:0}
+.adm-logo{font-size:1rem;font-weight:800;color:#fff;letter-spacing:.5px}
+.adm-logo em{color:var(--gold);font-style:normal}
+.adm-out{background:none;border:1px solid #555;color:#aaa;padding:4px 10px;border-radius:16px;font-size:.68rem;cursor:pointer}
+.adm-tabs{display:flex;background:#111;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid #222;flex-shrink:0}
+.adm-tabs::-webkit-scrollbar{display:none}
+.at{flex-shrink:0;padding:10px 13px;border:none;background:none;color:#666;font-size:.72rem;font-weight:600;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;letter-spacing:.2px;transition:all .15s}
+.at.on{color:var(--gold);border-bottom-color:var(--gold)}
+.adm-body{flex:1;overflow-y:auto;background:#f5f5f5}
+.asec{display:none;flex-direction:column;padding-bottom:20px}
+.asec.on{display:flex}
+.a-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px}
+.stat{background:#fff;border-radius:9px;padding:13px;border:1px solid var(--border);border-left:4px solid var(--red)}
+.stat-v{font-size:1.6rem;font-weight:800;color:var(--red)}
+.stat-l{font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.acard{margin:0 10px 10px;background:#fff;border-radius:9px;border:1px solid var(--border);overflow:hidden}
+.acard-h{padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700;font-size:.82rem;display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--ink)}
+.acard-b{padding:12px}
+.arow{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border);gap:10px;font-size:.8rem}
+.arow:last-child{border-bottom:none}
+.asel{border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;font-size:.7rem;font-family:inherit;color:var(--ink);outline:none;cursor:pointer;background:#fff}
+
+/* ── ADMIN PANEL FORM FIELDS (override dark auth theme) ── */
+#scrAdmin .fg label{
+  font-family:'DM Sans',sans-serif;
+  font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--muted);display:block;margin-bottom:4px;
+}
+#scrAdmin .fg input,
+#scrAdmin .fg select,
+#scrAdmin .fg textarea{
+  background:#fafafa;
+  border:1.5px solid var(--border);
+  color:var(--ink);
+  border-radius:8px;
+  padding:10px 12px;
+  font-size:.86rem;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:none;
+}
+#scrAdmin .fg input::placeholder,
+#scrAdmin .fg textarea::placeholder{
+  color:#bbb;
+}
+#scrAdmin .fg input:focus,
+#scrAdmin .fg select:focus,
+#scrAdmin .fg textarea:focus{
+  border-color:var(--red);
+  background:#fff;
+  box-shadow:none;
+}
+#scrAdmin .fg select{color:var(--ink)}
+#scrAdmin .btn-primary{
+  background:var(--red);
+  font-family:'DM Sans',sans-serif;
+  font-size:.88rem;font-weight:700;letter-spacing:0;
+  box-shadow:none;border-radius:8px;
+  text-transform:none;
+}
+#scrAdmin .btn-primary:hover{background:var(--red2);transform:none;}
+
+/* Upload zone */
+.upz{border:2px dashed var(--border);border-radius:9px;padding:16px;text-align:center;cursor:pointer;background:var(--gray);position:relative;overflow:hidden;transition:border .2s}
+.upz:hover{border-color:var(--red);background:#fff5f8}
+.upz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upz-ico{font-size:1.8rem;margin-bottom:4px}
+.upz p{font-size:.75rem;color:var(--muted)}
+.upz span{font-size:.68rem;color:var(--red);font-weight:600;display:block;margin-top:2px}
+.uth-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.uth{width:66px;height:76px;border-radius:6px;overflow:hidden;position:relative;border:1.5px solid var(--border)}
+.uth img{width:100%;height:100%;object-fit:cover}
+.uth-del{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:.5rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+/* Square banner uploader */
+.squpz{border:2px dashed var(--border);border-radius:8px;overflow:hidden;cursor:pointer;position:relative;background:var(--gray);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;transition:border .2s}
+.squpz:hover{border-color:var(--red)}
+.squpz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2}
+.squpz img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.squpz .sq-overlay{position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;z-index:1}
+.squpz .sq-ico{font-size:2rem}
+.squpz .sq-t{font-size:.7rem;color:#fff;font-weight:600}
+
+/* Circle upload */
+.ciru-row{display:flex;gap:10px;flex-wrap:wrap}
+.ciru{display:flex;flex-direction:column;align-items:center;gap:4px}
+.ciru-ring{width:56px;height:56px;border-radius:50%;overflow:hidden;border:2px dashed var(--border);background:var(--gray);position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.ciru-ring input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.ciru-ring img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ciru-lbl{font-size:.58rem;color:var(--muted);text-align:center;max-width:60px}
+
+/* Brand card upload */
+.bcu-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.bcu{border:1.5px dashed var(--border);border-radius:9px;overflow:hidden;position:relative;cursor:pointer;background:var(--gray)}
+.bcu input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2;width:100%;height:100%}
+.bcu img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.bcu-fall{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:3.5rem;background:linear-gradient(135deg,#fce8ec,#fef0e8)}
+.bcu-b{padding:7px 8px}
+.bcu-in{width:100%;border:1px solid var(--border);border-radius:5px;padding:4px 7px;font-size:.68rem;margin-bottom:3px;outline:none;font-family:inherit;background:#fff}
+.bcu-in:focus{border-color:var(--red)}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-6px);background:var(--ink);color:#fff;padding:8px 16px;border-radius:22px;font-size:.78rem;opacity:0;pointer-events:none;transition:all .28s;z-index:9999;white-space:nowrap;max-width:280px;text-align:center;box-shadow:0 3px 14px rgba(0,0,0,.22)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-6px)}
+  80%{transform:translateX(6px)}
+}
+
+/* ── WA FAB ── */
+.wafab{position:fixed;bottom:70px;right:10px;background:#25d366;color:#fff;border:none;border-radius:50%;width:46px;height:46px;font-size:1.3rem;display:none;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(37,211,102,.45);z-index:400;cursor:pointer}
+.wafab.on{display:flex}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div class="toast" id="toast"></div>
+<button class="wafab" id="waFab" onclick="openWA()">💬</button>
+
+<!-- ══════════════════════════════
+     AUTH
+══════════════════════════════ -->
+
+<!-- SEARCH OVERLAY - Fixed position, full screen -->
+<div id="searchOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:999;flex-direction:column;background:#fff;max-width:430px;margin:0 auto">
+  <!-- Header -->
+  <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--red);flex-shrink:0">
+    <button onclick="closeSearch()" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;padding:6px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" style="width:22px;height:22px"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
+    <div style="flex:1;display:flex;align-items:center;background:#fff;border-radius:22px;padding:9px 14px;gap:8px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2.5" style="width:18px;height:18px;flex-shrink:0"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <input id="si2" placeholder="Search Saree, Kurti, Party Wear..." oninput="doSearch()" style="border:none;background:transparent;outline:none;font-size:.92rem;font-family:inherit;flex:1;color:#333">
+      <button id="siClear" onclick="clearSearch()" style="display:none;background:none;border:none;cursor:pointer;color:#aaa;font-size:1.2rem;padding:0;line-height:1">&#x2715;</button>
+    </div>
+  </div>
+  <!-- Suggestions -->
+  <div id="srchSuggestBox" style="padding:12px 14px 8px;flex-shrink:0;border-bottom:1px solid #f0f0f0">
+    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#aaa;margin-bottom:10px">&#128293; Popular Searches</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button class="sugg-tag" onclick="setSearch('Saree')">&#129525; Saree</button>
+      <button class="sugg-tag" onclick="setSearch('Kurti')">&#128247; Kurti</button>
+      <button class="sugg-tag" onclick="setSearch('Party Wear')">&#10024; Party Wear</button>
+      <button class="sugg-tag" onclick="setSearch('Cotton Saree')">&#127800; Cotton</button>
+      <button class="sugg-tag" onclick="setSearch('Silk')">&#128142; Silk</button>
+      <button class="sugg-tag" onclick="setSearch('Daily Wear')">&#9728;&#65039; Daily</button>
+      <button class="sugg-tag" onclick="setSearch('New')">&#128465; New</button>
+    </div>
+  </div>
+  <!-- Category chips -->
+  <div style="display:flex;gap:8px;padding:10px 14px 8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0">
+    <button class="srch-chip on" onclick="searchCat('all',this)">All</button>
+    <button class="srch-chip" onclick="searchCat('saree',this)">Saree</button>
+    <button class="srch-chip" onclick="searchCat('kurti',this)">Kurti</button>
+    <button class="srch-chip" onclick="searchCat('party',this)">Party</button>
+    <button class="srch-chip" onclick="searchCat('daily',this)">Daily</button>
+    <button class="srch-chip" onclick="searchCat('new',this)">New</button>
+  </div>
+  <!-- Count -->
+  <div id="srchCount" style="padding:4px 14px 6px;font-size:.75rem;color:#888;flex-shrink:0"></div>
+  <!-- Results -->
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch">
+    <div class="pgrid" id="srchGrid"></div>
+    <div id="srchEmpty" style="display:none;text-align:center;padding:50px 20px">
+      <div style="font-size:3rem;margin-bottom:10px">&#128269;</div>
+      <div style="font-weight:700;font-size:.95rem;color:#333" id="srchEmptyMsg">काहीतरी search करा</div>
+      <div style="font-size:.8rem;color:#888;margin-top:8px;line-height:1.5">वरील suggestions tap करा</div>
+    </div>
+  </div>
+</div>
+
+<div class="scr on" id="scrAuth">
+
+  <!-- BRAND HERO -->
+  <div class="auth-hero">
+    <!-- Logo Mark -->
+    <div class="naari-mark">
+      <div class="naari-mark-ring">
+        <!-- Decorative lotus / floral emblem -->
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Outer petals -->
+          <ellipse cx="50" cy="22" rx="7" ry="14" fill="#e8657a" opacity="0.85" transform="rotate(0 50 50)"/>
+          <ellipse cx="50" cy="22" rx="7" ry="14" fill="#e8a07a" opacity="0.7" transform="rotate(45 50 50)"/>
+          <ellipse cx="50" cy="22" rx="7" ry="14" fill="#e8657a" opacity="0.85" transform="rotate(90 50 50)"/>
+          <ellipse cx="50" cy="22" rx="7" ry="14" fill="#e8a07a" opacity="0.7" transform="rotate(135 50 50)"/>
+          <ellipse cx="50" cy="22" rx="7" ry="14" fill="#e8657a" opacity="0.85" transform="rotate(180 50 50)"/>
+          <ellipse cx="50" cy="22" rx="7" ry="14" fill="#e8a07a" opacity="0.7" transform="rotate(225 50 50)"/>
+          <ellipse cx="50" cy="22" rx="7" ry="14" fill="#e8657a" opacity="0.85" transform="rotate(270 50 50)"/>
+          <ellipse cx="50" cy="22" rx="7" ry="14" fill="#e8a07a" opacity="0.7" transform="rotate(315 50 50)"/>
+          <!-- Inner petals -->
+          <ellipse cx="50" cy="30" rx="5" ry="10" fill="#f0c060" opacity="0.9" transform="rotate(22.5 50 50)"/>
+          <ellipse cx="50" cy="30" rx="5" ry="10" fill="#f0c060" opacity="0.9" transform="rotate(67.5 50 50)"/>
+          <ellipse cx="50" cy="30" rx="5" ry="10" fill="#f0c060" opacity="0.9" transform="rotate(112.5 50 50)"/>
+          <ellipse cx="50" cy="30" rx="5" ry="10" fill="#f0c060" opacity="0.9" transform="rotate(157.5 50 50)"/>
+          <ellipse cx="50" cy="30" rx="5" ry="10" fill="#f0c060" opacity="0.9" transform="rotate(202.5 50 50)"/>
+          <ellipse cx="50" cy="30" rx="5" ry="10" fill="#f0c060" opacity="0.9" transform="rotate(247.5 50 50)"/>
+          <ellipse cx="50" cy="30" rx="5" ry="10" fill="#f0c060" opacity="0.9" transform="rotate(292.5 50 50)"/>
+          <ellipse cx="50" cy="30" rx="5" ry="10" fill="#f0c060" opacity="0.9" transform="rotate(337.5 50 50)"/>
+          <!-- Centre circle -->
+          <circle cx="50" cy="50" r="12" fill="#3d1628"/>
+          <circle cx="50" cy="50" r="9" fill="none" stroke="#f0c060" stroke-width="1.5"/>
+          <circle cx="50" cy="50" r="4" fill="#e8657a"/>
+          <circle cx="50" cy="50" r="2" fill="#f0c060"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Brand Name -->
+    <div class="naari-brand">
+      <div class="naari-wordmark">Naari Fashion</div>
+      <div class="naari-tagline">Elegance · Style · Grace</div>
+    </div>
+    <div class="naari-ornament">
+      <div class="naari-ornament-dot"></div>
+      <div class="naari-ornament-dot"></div>
+      <div class="naari-ornament-dot"></div>
+    </div>
+  </div>
+
+  <!-- TABS — Hidden, Register accessible from link below Login -->
+  <div class="auth-tabs" id="authTabs" style="display:none">
+    <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</button>
+    <button class="auth-tab on" id="tabLogin" onclick="switchAuthTab('login')">Login</button>
+  </div>
+
+  <!-- BODY -->
+  <div class="auth-body">
+
+    <!-- Register Card -->
+    <div class="a-box" id="cSignup">
+      <div class="a-ttl">Create Account</div>
+      <div class="a-sub">Join the Naari family</div>
+      <div class="fg"><label>Full Name</label><input id="suN" placeholder="Sunita Sharma"></div>
+      <div class="fg"><label>Mobile Number</label><input id="suPh" placeholder="9876543210" type="tel"></div>
+      <div class="fg"><label>Email Address</label><input id="suE" placeholder="sunita@gmail.com" type="email"></div>
+      <div class="fg"><label>Password (4 अंकी)</label><input id="suP" placeholder="4 digit password" type="password" maxlength="4" inputmode="numeric" onkeydown="if(event.key==='Enter')doSignup()"></div>
+      <button class="btn-primary" onclick="doSignup()">Create Account</button>
+      <div class="a-sw">Already have an account? <b onclick="switchAuthTab('login')">Login</b></div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="a-box on" id="cLogin">
+      <div class="a-ttl" id="loginTitle" onclick="adminTapCount()" style="cursor:default">Welcome Back</div>
+      <div class="a-sub">Login to your account</div>
+      <div class="fg"><label>Mobile / Email</label><input id="liE" placeholder="9876543210" type="text" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fg"><label>Password</label><input id="liP" placeholder="4 digit password" type="password" maxlength="4" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn-primary" onclick="doLogin()">Login</button>
+      <div class="a-sw">New here? <b onclick="switchAuthTab('register')">Create Account</b></div>
+    </div>
+
+    <!-- Admin Card (hidden, tap x5 to reveal) -->
+    <div class="a-box" id="cAdmin">
+      <div class="a-ttl">Admin Access</div>
+      <div class="a-sub">Authorized personnel only</div>
+      <div class="fg"><label>Admin ID</label><input id="adI" placeholder="admin"></div>
+      <div class="fg"><label>Password</label><input id="adP" placeholder="••••••••" type="password"></div>
+      <button class="btn-primary" onclick="doAdminLogin()">Login as Admin</button>
+      <div class="a-sw"><b onclick="switchAuthTab('login')">← Back to Login</b></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     USER APP
+══════════════════════════════ -->
+<div class="scr" id="scrUser">
+
+  <!-- TOPBAR -->
+  <div class="topbar" id="mainTopbar">
+    <div class="loc-row">
+      <span>📍</span>
+      <span>Deliver to</span>
+      <b id="locTxt">Sunita Sharma — Pune, Maharashtra</b>
+      <span class="arr">▾</span>
+    </div>
+    <div class="sr-row">
+      <div class="srch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2.5" style="width:18px;height:18px;flex-shrink:0"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input id="si1" placeholder='Search "Saree", "Kurti"...' oninput="doSearchInline()" onfocus="focusSearch()" readonly onclick="focusSearch()" style="flex:1;border:none;background:transparent;outline:none;font-size:.88rem;color:#333;font-family:inherit;cursor:pointer">
+      </div>
+      <button class="ti" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:26px;height:26px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <button class="ti" onclick="showPanel('pWish')" title="Wishlist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:26px;height:26px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <div class="ti-wrap">
+        <button class="ti" onclick="toggleProfileMenu()" title="Profile" id="profIconBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:26px;height:26px"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+        </button>
+        <div class="prof-dropdown" id="profDropdown">
+          <div class="pd-header">
+            <span>Welcome</span>
+            <p>To access account and manage orders</p>
+          </div>
+          <button class="pd-btn" onclick="toggleProfileMenu();showPanel('pProfile')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+            My Profile
+          </button>
+          <button class="pd-btn" onclick="toggleProfileMenu();showPanel('pOrders');loadOrders()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+            Orders
+          </button>
+          <button class="pd-btn" onclick="toggleProfileMenu();showPanel('pWish');loadWishlist()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Wishlist
+          </button>
+          <button class="pd-btn" onclick="toggleProfileMenu();goToAdminPanel()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Admin Panel
+          </button>
+          <div class="pd-divider"></div>
+          <button class="pd-btn pd-logout" onclick="toggleProfileMenu();doLogout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="ctabs" id="ctabsBar">
+      <button class="ct on" onclick="setCT(this,'all')">All</button>
+      <button class="ct" onclick="setCT(this,'saree')">Saree</button>
+      <button class="ct" onclick="setCT(this,'kurti')">Kurti</button>
+      <button class="ct" onclick="setCT(this,'party')">Party</button>
+      <button class="ct" onclick="setCT(this,'daily')">Daily</button>
+      <button class="ct" onclick="setCT(this,'new')">New</button>
+      <button class="ct-more">⋯</button>
+    </div>
+  </div>
+
+  <!-- PANEL (scrollable area) -->
+  <div class="panel" id="mainPanel">
+
+    <!-- HOME -->
+    <div class="sub-panel on" id="pHome">
+      <div class="circles" id="circlesRow"></div>
+      <div class="ban-outer"><div class="ban-inner">
+        <div class="ban-track" id="banTrack"></div>
+      </div></div>
+      <div class="ban-dots-row" id="banDots"></div>
+
+
+      <div class="promo">
+        <div class="promo-ico">🪙</div>
+        <div class="promo-txt">Get <b>7.5% Cashback*</b> | 0 Joining Fee<br>With UPI & Bank Offers</div>
+        <button class="promo-btn">Apply Now ›</button>
+      </div>
+      <div class="sh"><h2>FEATURED <span>BRANDS</span></h2><a>See All</a></div>
+      <div class="brand-grid" id="brandGrid"></div>
+      <div class="sh"><h2 id="prodH">🛍️ <span>ALL PRODUCTS</span></h2><a onclick="resetCat()">See All</a></div>
+      <div class="pgrid" id="prodGrid"></div>
+      <div style="height:16px"></div>
+    </div>
+
+    <!-- SEARCH -->
+
+        <!-- PRODUCT DETAIL -->
+    <div class="sub-panel" id="pDetail">
+      <div class="dh">
+        <button class="back" onclick="showPanel('pHome')">←</button>
+        <div class="dh-ttl" id="dhTtl">Product</div>
+        <button class="ti" onclick="showPanel('pWish')">🤍</button>
+        <button class="ti" onclick="showPanel('pCart');renderCart()">🛒<span class="tbadge" id="cBadge2">0</span></button>
+      </div>
+      <div class="d-slider">
+        <div class="d-track" id="dTrack"></div>
+        <div class="d-arrows">
+          <button class="d-arr" onclick="dSlide(-1)">‹</button>
+          <button class="d-arr" onclick="dSlide(1)">›</button>
+        </div>
+      </div>
+      <div class="d-thumbs" id="dThumbs"></div>
+      <div class="d-body" id="dBody" style="overflow-y:auto"></div>
+      <div class="d-sticky" id="dSticky"></div>
+    </div>
+
+    <!-- CART -->
+    <div class="sub-panel" id="pCart">
+      <div class="cart-hd">
+        <button class="back" onclick="showPanel('pHome')">←</button>
+        <span>Shopping Bag 🛒</span>
+      </div>
+      <div style="overflow-y:auto;flex:1">
+        <div id="cartItems"></div>
+        <div id="cartBelow"></div>
+      </div>
+    </div>
+
+    <!-- CHECKOUT -->
+    <div class="sub-panel" id="pCheckout">
+      <div class="cart-hd">
+        <button class="back" onclick="showPanel('pCart')">←</button>
+        <span>Checkout 💳</span>
+      </div>
+      <div style="overflow-y:auto;flex:1;padding-bottom:16px">
+        <div class="ck-card" style="margin-top:10px">
+          <div class="ck-hd">📍 Delivery Address</div>
+          <div class="ck-body">
+            <div class="fg"><label>Full Name</label><input id="ckN" placeholder="Sunita Sharma"></div>
+            <div class="fg"><label>Mobile</label><input id="ckPh" placeholder="9876543210" type="tel"></div>
+            <div class="fg"><label>Address</label><textarea id="ckA" rows="2" placeholder="House no, Street, Area..."></textarea></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div class="fg"><label>City</label><input id="ckC" placeholder="Pune"></div>
+              <div class="fg"><label>Pincode</label><input id="ckPn" placeholder="411001" type="tel"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ck-card">
+          <div class="ck-hd">🏷️ Coupon Code</div>
+          <div class="ck-body">
+            <div style="display:flex;gap:7px">
+              <input id="ckCoup" placeholder="NAARI20 / HOLI30" style="flex:1;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:.8rem;outline:none">
+              <button class="apply-btn" onclick="apCoup()">Apply</button>
+            </div>
+            <div id="ckCoupMsg" style="font-size:.7rem;margin-top:5px"></div>
+          </div>
+        </div>
+        <div class="ck-card">
+          <div class="ck-hd">💳 Payment Method</div>
+          <div class="ck-body">
+            <div class="pay-opt on" onclick="selPay(this)"><div class="pay-ico">📱</div><div><div class="pay-n">UPI Payment</div><div class="pay-s">GPay, PhonePe, Paytm</div></div><div class="pay-radio"></div></div>
+            <div class="pay-opt" onclick="selPay(this)"><div class="pay-ico">💵</div><div><div class="pay-n">Cash on Delivery</div><div class="pay-s">Pay when delivered</div></div><div class="pay-radio"></div></div>
+            <div class="pay-opt" onclick="selPay(this)"><div class="pay-ico">💳</div><div><div class="pay-n">Razorpay / Card</div><div class="pay-s">Credit, Debit, Net Banking</div></div><div class="pay-radio"></div></div>
+            <div class="pay-opt" onclick="selPay(this)"><div class="pay-ico">🏦</div><div><div class="pay-n">Bank Transfer</div><div class="pay-s">NEFT / IMPS</div></div><div class="pay-radio"></div></div>
+          </div>
+        </div>
+        <div id="ckSumWrap" style="margin:0 10px 10px"></div>
+        <div style="padding:0 10px"><button class="btn-primary" onclick="placeOrder()">✅ Place Order</button></div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="sub-panel" id="pOrders">
+      <div class="cart-hd">
+        <button class="back" onclick="showPanel('pHome')">←</button>
+        <span>My Orders 📦</span>
+      </div>
+      <div style="overflow-y:auto;flex:1" id="ordersCont"></div>
+    </div>
+
+    <!-- WISHLIST -->
+    <div class="sub-panel" id="pWish">
+      <div class="cart-hd">
+        <button class="back" onclick="showPanel('pHome')">←</button>
+        <span>Wishlist 🤍</span>
+      </div>
+      <div style="overflow-y:auto;flex:1" id="wishCont"></div>
+    </div>
+
+    <!-- PROFILE -->
+<!-- PROFILE - Myntra Style -->
+    <div class="sub-panel" id="pProfile">
+      <div style="overflow-y:auto;flex:1;background:var(--gray)">
+        
+        <!-- Header -->
+        <div class="prof-hd">
+          <button class="back" onclick="showPanel('pHome')">←</button>
+          <span class="prof-hd-ttl">Profile</span>
+          <div class="prof-hd-right">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            <span id="profWallet">₹0</span>
+          </div>
+        </div>
+
+        <!-- Sale Banner -->
+        <div class="prof-sale" id="birthdayBlastCard" onclick="navTo(document.getElementById('bn-bigsale')||document.querySelector('.bn'),'pBigSale')">
+          <h3 id="bblastTitle">🎂 BIRTHDAY BLAST</h3>
+          <p id="bblastSubtitle">WISHLIST NOW! SALE STARTS ON</p>
+          <div class="sale-off" id="bblastOffer">50-90% OFF • FEB 28</div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="prof-actions">
+          <button class="pa-btn" onclick="showPanel('pOrders');loadOrders()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12M15 9v12"/></svg>
+            <span>Orders</span>
+            <span class="arr">›</span>
+          </button>
+          <button class="pa-btn" onclick="toast('Coming soon!')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4.5L6 21l1.5-7.5L2 9h7l3-7z"/></svg>
+            <span>Insider</span>
+            <span class="arr">›</span>
+          </button>
+          <button class="pa-btn" onclick="openHelpCenter()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5"/></svg>
+            <span>Help Center</span>
+            <span class="arr">›</span>
+          </button>
+          <button class="pa-btn" onclick="toast('Coming soon!')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20M6 14h.01M10 14h4"/></svg>
+            <span>Coupons</span>
+            <span class="arr">›</span>
+          </button>
+        </div>
+
+        <!-- Menu Items -->
+        <div class="prof-menu">
+          <button class="pm2" onclick="toast('Coming soon!')">
+            <div class="pm2-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4.5L6 21l1.5-7.5L2 9h7l3-7z"/></svg></div>
+            <div class="pm2-txt">
+              <div class="pm2-t">Ultimate Glam Clan <span class="pm2-new">NEW</span></div>
+              <div class="pm2-s">Naari Influencer program for shoppers</div>
+            </div>
+            <div class="pm2-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+          </button>
+          <button class="pm2" onclick="toast('Coming soon!')">
+            <div class="pm2-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg></div>
+            <div class="pm2-txt">
+              <div class="pm2-t">Naari Credit Card <span class="pm2-new">NEW</span></div>
+              <div class="pm2-s">0 Joining fee, 7.5% cashback</div>
+            </div>
+            <div class="pm2-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+          </button>
+          <button class="pm2" onclick="toast('Coming soon!')">
+            <div class="pm2-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+            <div class="pm2-txt">
+              <div class="pm2-t">Personal Loan <span class="pm2-new">NEW</span></div>
+              <div class="pm2-s">Get instant cash upto Rs.10,00,000</div>
+            </div>
+            <div class="pm2-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+          </button>
+        </div>
+
+        <div class="prof-menu">
+          <button class="pm2" onclick="toast('Coming soon!')">
+            <div class="pm2-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M2 12h20"/></svg></div>
+            <div class="pm2-txt">
+              <div class="pm2-t">Payments & Currencies</div>
+              <div class="pm2-s">View balance and saved payment methods</div>
+            </div>
+            <div class="pm2-expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+          </button>
+          <button class="pm2" onclick="toast('Coming soon!')">
+            <div class="pm2-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg></div>
+            <div class="pm2-txt">
+              <div class="pm2-t">Earn & Redeem</div>
+              <div class="pm2-s">View prizes and earn rewards</div>
+            </div>
+            <div class="pm2-expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+          </button>
+          <button class="pm2" onclick="toast('Coming soon!')">
+            <div class="pm2-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+            <div class="pm2-txt">
+              <div class="pm2-t">Manage Account</div>
+              <div class="pm2-s">Manage your account and saved addresses</div>
+            </div>
+            <div class="pm2-expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+          </button>
+        </div>
+
+        <div class="prof-menu">
+          <button class="pm2" onclick="toast('Coming soon!')">
+            <div class="pm2-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+            <div class="pm2-txt">
+              <div class="pm2-t">Challenges</div>
+              <div class="pm2-s">Earn prizes by completing fun tasks</div>
+            </div>
+            <div class="pm2-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+          </button>
+          <button class="pm2" onclick="showPanel('pWish');loadWishlist()">
+            <div class="pm2-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+            <div class="pm2-txt">
+              <div class="pm2-t">Wishlist</div>
+              <div class="pm2-s">Your most loved styles</div>
+            </div>
+            <div class="pm2-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+          </button>
+          <button class="pm2" onclick="toast('Coming soon!')">
+            <div class="pm2-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+            <div class="pm2-txt">
+              <div class="pm2-t">Naari Suggests</div>
+              <div class="pm2-s">100% personalized feed just for you</div>
+            </div>
+            <div class="pm2-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+          </button>
+          <button class="pm2" onclick="toast('Coming soon!')">
+            <div class="pm2-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+            <div class="pm2-txt">
+              <div class="pm2-t">Settings</div>
+              <div class="pm2-s">Manage Notifications</div>
+            </div>
+            <div class="pm2-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+          </button>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="prof-footer">
+          <a class="pf-link" onclick="toast('FAQs')">FAQs</a>
+          <a class="pf-link" onclick="toast('About Us')">ABOUT US</a>
+          <a class="pf-link" onclick="toast('Terms')">TERMS OF USE</a>
+          <a class="pf-link" onclick="toast('Privacy')">PRIVACY POLICY</a>
+          <a class="pf-link" onclick="toast('Grievance')">GRIEVANCE REDRESSAL</a>
+          <a class="pf-link" onclick="toast('Privacy Center')">PRIVACY CENTER</a>
+        </div>
+
+        <!-- Admin Panel Link (hidden, tap x5) -->
+
+        <!-- Logout Button -->
+        <button class="prof-logout" onclick="doLogout()">LOG OUT</button>
+
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
+    <!-- BUDGET (Under ₹999) -->
+    <div class="sub-panel" id="pBudget">
+      <div class="dh">
+        <button class="back" onclick="showPanel('pHome')">&#8592;</button>
+        <div class="dh-ttl">Under &#8377;999</div>
+      </div>
+      <div style="overflow-y:auto;flex:1"><div class="pgrid" id="budgetGrid"></div></div>
+    </div>
+
+    <!-- BIG SALE -->
+    <div class="sub-panel" id="pBigSale">
+      <div class="dh" style="flex-shrink:0">
+        <button class="back" onclick="showPanel('pHome')">&#8592;</button>
+        <div class="dh-ttl" style="display:flex;align-items:center;gap:6px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Big Sale
+        </div>
+      </div>
+      <div style="overflow-y:auto;flex:1" id="bigSaleContent">
+        <!-- Admin uploaded banners + sale products shown here -->
+        <div id="bigSaleBanners" style="padding:0"></div>
+        <div style="padding:10px 12px 4px">
+          <div style="font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.3px">Sale Products</div>
+        </div>
+        <div class="pgrid" id="bigSaleGrid" style="margin-top:4px"></div>
+        <div style="height:16px"></div>
+      </div>
+    </div>
+
+    <!-- SUPPORT CHAT -->
+    <!-- SUPPORT CHAT - WhatsApp Style -->
+    <div class="sub-panel" id="pSupport" style="flex-direction:column;background:#ece5dd">
+
+      <!-- Header -->
+      <div class="supp-hd">
+        <button class="supp-back" onclick="showPanel('pHome');leaveSupportChat()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="supp-avatar">A</div>
+        <div class="supp-hd-info">
+          <div class="supp-name">Adinath (Support)</div>
+          <div class="supp-status" id="suppStatus">Online</div>
+        </div>
+        <div style="display:flex;gap:6px;margin-left:auto">
+          <button onclick="openHelpCenter()" style="background:none;border:none;cursor:pointer;padding:4px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:20px;height:20px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.32 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Date chip -->
+      <div style="text-align:center;padding:10px 0 4px;flex-shrink:0">
+        <span style="background:rgba(0,0,0,.18);color:#fff;font-size:.65rem;padding:3px 10px;border-radius:10px" id="suppDateChip"></span>
+      </div>
+
+      <!-- Messages area -->
+      <div style="flex:1;overflow-y:auto;padding:8px 10px 4px;display:flex;flex-direction:column;gap:6px" id="supportChatBox">
+        <!-- Loading -->
+        <div id="suppLoading" style="text-align:center;padding:20px;color:rgba(255,255,255,.7);font-size:.8rem">Loading messages...</div>
+      </div>
+
+      <!-- Input bar -->
+      <div class="supp-input-row">
+        <!-- + button for attachment -->
+        <label class="supp-attach-btn" title="File / Image पाठवा">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:22px;height:22px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <input type="file" id="suppImgInp" accept="image/*,application/pdf,.doc,.docx" style="display:none" onchange="sendSupportFile(event)">
+        </label>
+        <div class="supp-input-wrap">
+          <input id="suppMsgInp" placeholder="Message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendSupportMsg()}" style="width:100%;border:none;background:transparent;outline:none;font-size:.9rem;font-family:inherit;padding:2px 0">
+        </div>
+        <button class="supp-send-btn" onclick="sendSupportMsg()" id="suppSendBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="width:20px;height:20px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /panel -->
+
+  <!-- BOTTOM NAV - Instagram Style SVG Icons -->
+  <nav class="bnav" id="mainBnav">
+    <!-- Home -->
+    <button class="bn on" onclick="navTo(this,'pHome')" id="bn-home">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:23px;height:23px"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+      </span>
+      <span class="lbl">Home</span>
+    </button>
+    <!-- Under ₹999 -->
+    <button class="bn" onclick="navTo(this,'pBudget')" id="bn-budget">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:23px;height:23px"><circle cx="12" cy="12" r="9"/><path d="M12 7v1m0 8v1M9.5 9.5C9.5 8.1 10.6 7 12 7s2.5 1.1 2.5 2.5c0 1.8-2.5 3-2.5 3m0 2h.01"/></svg>
+      </span>
+      <span class="lbl">Under ₹999</span>
+    </button>
+    <!-- Filter / Price -->
+    <button class="bn" onclick="openFilterSheet()" id="bn-filter">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:23px;height:23px"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+      </span>
+      <span class="lbl">Filter</span>
+    </button>
+    <!-- Support Chat -->
+    <button class="bn" onclick="navTo(this,'pSupport')" id="bn-support">
+      <span class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:23px;height:23px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </span>
+      <span class="lbl">Support</span>
+    </button>
+    <!-- Bag -->
+    <button class="bn" onclick="navTo(this,'pCart');renderCart()" id="bn-bag">
+      <span class="ico" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:23px;height:23px"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="bn-badge" id="cBadge3">0</span>
+      </span>
+      <span class="lbl">Bag</span>
+    </button>
+  </nav>
+
+  <!-- FILTER BOTTOM SHEET -->
+  <div class="filter-sheet" id="filterSheet">
+    <div class="filter-backdrop" onclick="closeFilterSheet()"></div>
+    <div class="filter-panel">
+      <div class="filter-hd">
+        <span>Filter by Price</span>
+        <button onclick="closeFilterSheet()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted)">✕</button>
+      </div>
+      <div class="filter-body">
+        <div class="filter-lbl">Select Price Range</div>
+        <div class="price-chips" id="priceChips">
+          <button class="pchip" onclick="applyPriceFilter(0,500,this)">Under ₹500</button>
+          <button class="pchip" onclick="applyPriceFilter(0,1000,this)">Under ₹1,000</button>
+          <button class="pchip" onclick="applyPriceFilter(0,2000,this)">Under ₹2,000</button>
+          <button class="pchip" onclick="applyPriceFilter(0,5000,this)">Under ₹5,000</button>
+          <button class="pchip" onclick="applyPriceFilter(0,10000,this)">Under ₹10,000</button>
+          <button class="pchip" onclick="applyPriceFilter(0,20000,this)">Under ₹20,000</button>
+          <button class="pchip on" onclick="applyPriceFilter(0,999999,this)">All Prices</button>
+        </div>
+        <div class="filter-lbl" style="margin-top:16px">Category</div>
+        <div class="price-chips">
+          <button class="pchip on" onclick="setCatFilter('all',this)">All</button>
+          <button class="pchip" onclick="setCatFilter('saree',this)">Saree</button>
+          <button class="pchip" onclick="setCatFilter('kurti',this)">Kurti</button>
+          <button class="pchip" onclick="setCatFilter('party',this)">Party</button>
+          <button class="pchip" onclick="setCatFilter('daily',this)">Daily</button>
+          <button class="pchip" onclick="setCatFilter('new',this)">New</button>
+        </div>
+      </div>
+      <div style="padding:12px 16px 20px">
+        <button onclick="applyFilterAndShow()" style="width:100%;padding:13px;background:var(--red);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer">Apply Filter ✓</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /scrUser -->
+
+<!-- ══════════════════════════════
+     ADMIN
+══════════════════════════════ -->
+<div class="scr" id="scrAdmin">
+  <div class="adm-top">
+    <div class="adm-logo">⚙️ Naari <em>Admin</em></div>
+    <div style="display:flex;gap:8px">
+      <button class="adm-out" onclick="goToUserApp()" style="border-color:var(--green);color:var(--green)">👤 User App</button>
+      <button class="adm-out" onclick="doLogout()">🚪 Logout</button>
+    </div>
+  </div>
+  <div class="adm-tabs">
+    <button class="at on" onclick="showAt(this,'aDash')">📊 Dashboard</button>
+    <button class="at" onclick="showAt(this,'aProds')">📦 Products</button>
+    <button class="at" onclick="showAt(this,'aBanners')">🖼️ Banners</button>
+    <button class="at" onclick="showAt(this,'aOrders')">🛒 Orders</button>
+    <button class="at" onclick="showAt(this,'aOffers')">🏷️ Offers</button>
+    <button class="at" onclick="showAt(this,'aStock')">📋 Stock</button>
+    <button class="at" onclick="showAt(this,'aSettings')">⚙️ Settings</button>
+    <button class="at" onclick="showAt(this,'aSupport');loadAdminChats()">💬 Support</button>
+    <button class="at" onclick="showAt(this,'aBigSale');renderBigSaleAdmin()">🏷️ Big Sale</button>
+    <button class="at" onclick="showAt(this,'aNavEdit')">🔧 Bottom Nav</button>
+  </div>
+  <div class="adm-body">
+
+    <!-- DASHBOARD -->
+    <div class="asec on" id="aDash">
+      <div class="a-stats" id="aStats"></div>
+      <div class="acard" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:none">
+        <div class="acard-h" style="color:#fff;border-color:rgba(255,255,255,.1)">🔥 Firebase Sync</div>
+        <div class="acard-b" style="padding:12px">
+          <p style="color:rgba(255,255,255,.7);font-size:.75rem;margin-bottom:10px">सगळे Products Firebase वर upload करा (पहिल्यांदा)</p>
+          <button onclick="uploadAllProducts()" style="background:var(--green);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-size:.8rem">☁️ Upload All Products to Firebase</button>
+        </div>
+      </div>
+      <div class="acard"><div class="acard-h">📦 Recent Orders</div><div id="aDashOrd"></div></div>
+      <div class="acard"><div class="acard-h">⚠️ Low Stock Alerts</div><div id="aDashStock"></div></div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="asec" id="aProds">
+      <div class="acard" style="margin-top:10px">
+        <div class="acard-h">➕ Upload New Product</div>
+        <div class="acard-b">
+          <div class="fg"><label>Product Name *</label><input id="apN" placeholder="Banarasi Silk Saree"></div>
+          <div class="fg"><label>Brand</label><input id="apBr" placeholder="Naari Fashion"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="fg"><label>Category *</label>
+              <select id="apCat">
+                <option value="saree">🥻 Saree</option>
+                <option value="kurti">👗 Kurti</option>
+                <option value="party">✨ Party Wear</option>
+                <option value="daily">☀️ Daily Wear</option>
+                <option value="new">🆕 New Arrivals</option>
+              </select>
+            </div>
+            <div class="fg"><label>Stock *</label><input id="apSt" type="number" placeholder="50"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="fg"><label>Selling Price ₹ *</label><input id="apPr" type="number" placeholder="999"></div>
+            <div class="fg"><label>MRP ₹ *</label><input id="apMr" type="number" placeholder="1499"></div>
+          </div>
+          <div class="fg"><label>Description</label><textarea id="apDs" rows="3" placeholder="Product description..."></textarea></div>
+          <div class="fg">
+            <label>📸 Product Photos (Multiple)</label>
+            <div class="upz" id="upZone">
+              <input type="file" accept="image/*" multiple onchange="handlePImgs(event)" id="pImgInp">
+              <div class="upz-ico">📷</div>
+              <p>Click or drag photos here</p>
+              <span>JPG, PNG, WEBP — Multiple photos allowed</span>
+            </div>
+            <div class="uth-row" id="upThumbs"></div>
+          </div>
+          <div class="fg"><label>Emoji (if no photo)</label><input id="apEm" placeholder="🥻" style="width:60px"></div>
+          <button class="btn-primary" onclick="adminAddProd()">📤 Upload Product</button>
+        </div>
+      </div>
+      <div class="acard">
+        <div class="acard-h">📋 Product List <span id="aPCnt" style="font-size:.7rem;color:var(--muted);font-weight:400"></span></div>
+        <div id="aPList" style="padding:0"></div>
+      </div>
+    </div>
+
+    <!-- BANNERS -->
+    <div class="asec" id="aBanners">
+      <div class="acard" style="margin-top:10px">
+        <div class="acard-h">🖼️ Banner Slides (auto-slides every 4 sec)</div>
+        <div class="acard-b">
+          <p style="font-size:.73rem;color:var(--muted);margin-bottom:10px">Upload square/wide banner images — they will auto-slide every 4 seconds</p>
+          <div id="banUpList"></div>
+          <button class="btn-primary" style="margin-top:10px" onclick="addBannerSlot()">+ Add New Banner Slot</button>
+        </div>
+      </div>
+      <div class="acard">
+        <div class="acard-h">⭕ Circle Category Images</div>
+        <div class="acard-b">
+          <p style="font-size:.73rem;color:var(--muted);margin-bottom:10px">Upload round images for each category (shown at top of home screen)</p>
+          <div class="ciru-row" id="ciruRow"></div>
+        </div>
+      </div>
+      <div class="acard">
+        <div class="acard-h">🏷️ Featured Brand Cards</div>
+        <div class="acard-b">
+          <p style="font-size:.73rem;color:var(--muted);margin-bottom:10px">Upload square images for brand cards (shown on home screen)</p>
+          <div class="bcu-grid" id="bcuGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="asec" id="aOrders">
+      <div class="acard" style="margin-top:10px">
+        <div class="acard-h">🛒 All Orders</div>
+        <div id="aOrdList" style="padding:0"></div>
+      </div>
+    </div>
+
+    <!-- OFFERS -->
+    <div class="asec" id="aOffers">
+      <div class="acard" style="margin-top:10px">
+        <div class="acard-h">🏷️ Create Coupon</div>
+        <div class="acard-b">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="fg"><label>Code</label><input id="ofC" placeholder="NAARI20"></div>
+            <div class="fg"><label>Discount %</label><input id="ofD" type="number" placeholder="20"></div>
+          </div>
+          <div class="fg"><label>Minimum Order ₹</label><input id="ofM" type="number" placeholder="500"></div>
+          <button class="btn-primary" onclick="adminAddCoupon()">✅ Create Coupon</button>
+        </div>
+      </div>
+      <div class="acard"><div class="acard-h">🎟️ Active Coupons</div><div id="aCoupList" style="padding:0"></div></div>
+    </div>
+
+    <!-- STOCK -->
+    <div class="asec" id="aStock">
+      <div class="acard" style="margin-top:10px">
+        <div class="acard-h">📋 Stock Management</div>
+        <div id="aStockList" style="padding:0"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="asec" id="aSettings">
+
+      <!-- Birthday Blast Editor -->
+      <div class="acard" style="margin-top:10px">
+        <div class="acard-h">🎂 Birthday Blast Offer Edit करा</div>
+        <div class="acard-b">
+          <div class="fg"><label>Title (e.g. BIRTHDAY BLAST)</label>
+            <input id="bblastTitleInp" placeholder="🎂 BIRTHDAY BLAST" oninput="previewBlast()">
+          </div>
+          <div class="fg"><label>Subtitle (e.g. SALE STARTS ON)</label>
+            <input id="bblastSubInp" placeholder="WISHLIST NOW! SALE STARTS ON" oninput="previewBlast()">
+          </div>
+          <div class="fg"><label>Offer Text (e.g. 50-90% OFF • FEB 28)</label>
+            <input id="bblastOfferInp" placeholder="50-90% OFF • FEB 28" oninput="previewBlast()">
+          </div>
+          <div class="fg"><label>Background Color</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap" id="blastColorPicker">
+              <button class="blast-color on" style="background:linear-gradient(135deg,#6b5ce7,#a78bfa)" onclick="selectBlastColor('linear-gradient(135deg,#6b5ce7 0%,#8b7cf7 50%,#a78bfa 100%)',this)">Purple</button>
+              <button class="blast-color" style="background:linear-gradient(135deg,#ff3f6c,#c0254a)" onclick="selectBlastColor('linear-gradient(135deg,#ff3f6c,#c0254a)',this)">Red</button>
+              <button class="blast-color" style="background:linear-gradient(135deg,#ff6b00,#ff9800)" onclick="selectBlastColor('linear-gradient(135deg,#ff6b00,#ff9800)',this)">Orange</button>
+              <button class="blast-color" style="background:linear-gradient(135deg,#0e9a6b,#11998e)" onclick="selectBlastColor('linear-gradient(135deg,#0e9a6b,#11998e)',this)">Green</button>
+              <button class="blast-color" style="background:linear-gradient(135deg,#1a1a2e,#16213e)" onclick="selectBlastColor('linear-gradient(135deg,#1a1a2e,#16213e)',this)">Dark</button>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="saveBirthdayBlast()">💾 Save Birthday Blast</button>
+        </div>
+      </div>
+
+      <!-- Help Center Number -->
+      <div class="acard">
+        <div class="acard-h">📞 Help Center Number</div>
+        <div class="acard-b">
+          <p style="font-size:.75rem;color:var(--muted);margin-bottom:10px">User profile मध्ये Help Center वर click केल्यावर हा नंबर दिसेल / WhatsApp उघडेल</p>
+          <div class="fg"><label>WhatsApp / Phone Number</label>
+            <input id="helpCenterNum" placeholder="9876543210" type="tel">
+          </div>
+          <div class="fg"><label>Help Text</label>
+            <input id="helpCenterTxt" placeholder="आम्हाला WhatsApp करा - Mon-Sat 10am-7pm">
+          </div>
+          <button class="btn-primary" onclick="saveHelpCenter()">💾 Save Help Number</button>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="acard">
+        <div class="acard-h">🔐 Admin Password बदला</div>
+        <div class="acard-b">
+          <div class="fg"><label>Current Password</label><input id="sCurP" type="password" placeholder="Current password"></div>
+          <div class="fg"><label>New Password</label><input id="sNewP" type="password" placeholder="New password"></div>
+          <div class="fg"><label>Confirm New Password</label><input id="sConP" type="password" placeholder="Confirm new password"></div>
+          <button class="btn-primary" onclick="changeAdminPassword()">🔐 Password बदला</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPPORT CHAT ADMIN -->
+    <div class="asec" id="aSupport">
+      <div class="acard" style="margin-top:10px">
+        <div class="acard-h">
+          <span>&#128172; User Support Messages</span>
+          <button onclick="loadAdminChats()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:inherit">&#128257; Refresh</button>
+        </div>
+        <!-- User selector -->
+        <div style="padding:10px 12px;border-bottom:1px solid var(--border)">
+          <div style="font-size:.72rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;font-weight:600;letter-spacing:.4px">Active Conversations</div>
+          <div id="chatUserList" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+        <!-- Chat area -->
+        <div id="adminChatArea" style="display:none">
+          <div style="padding:10px 12px;background:#f0f0f0;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)">
+            <button onclick="document.getElementById('adminChatArea').style.display='none'" style="background:none;border:none;font-size:1rem;cursor:pointer">&#8592;</button>
+            <span id="chatUserName" style="font-weight:700;font-size:.88rem"></span>
+            <span id="chatUserPhone" style="font-size:.72rem;color:var(--muted)"></span>
+          </div>
+          <div class="adm-chat-box" id="adminChatMsgs"></div>
+          <div class="adm-chat-input">
+            <input id="adminReplyInp" placeholder="Reply लिहा... (Enter = send)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAdminReply()}">
+            <button onclick="sendAdminReply()" style="background:var(--red);min-width:60px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="width:16px;height:16px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="noChatMsg" style="padding:24px;text-align:center;color:var(--muted);font-size:.82rem">
+          अजून कोणतेही support messages नाहीत
+        </div>
+      </div>
+    </div>
+
+    <!-- BIG SALE ADMIN -->
+    <div class="asec" id="aBigSale">
+      <div class="acard" style="margin-top:10px">
+        <div class="acard-h">🏷️ Big Sale Banner Upload</div>
+        <div class="acard-b">
+          <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px">Big Sale page वर दाखवायचे banner images upload करा</p>
+          <div style="border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;position:relative;margin-bottom:10px" onclick="document.getElementById('saleBanInp').click()">
+            <input type="file" id="saleBanInp" accept="image/*" multiple style="display:none" onchange="uploadSaleBanners(event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" style="width:32px;height:32px;margin:0 auto 6px"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <p style="font-size:.78rem;color:var(--muted)">Banner Images Click करून upload करा</p>
+          </div>
+          <div id="saleBanPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
+          <button class="btn-primary" onclick="saveSaleBanners()">💾 Save Sale Banners</button>
+        </div>
+      </div>
+      <div class="acard">
+        <div class="acard-h">📦 Sale Products Manage</div>
+        <div class="acard-b">
+          <p style="font-size:.75rem;color:var(--muted);margin-bottom:10px">Big Sale मध्ये कोणते products दाखवायचे ते select करा</p>
+          <div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="toggleAllSaleProds(true)" style="padding:5px 12px;border:1px solid var(--green);color:var(--green);background:#fff;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:inherit">सर्व Add करा</button>
+            <button onclick="toggleAllSaleProds(false)" style="padding:5px 12px;border:1px solid var(--muted);color:var(--muted);background:#fff;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:inherit">सर्व Remove करा</button>
+          </div>
+          <div id="saleProdList" style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV EDITOR -->
+    <div class="asec" id="aNavEdit">
+      <div class="acard" style="margin-top:10px">
+        <div class="acard-h">&#128295; Bottom Nav Customize</div>
+        <div class="acard-b">
+          <p style="font-size:.75rem;color:var(--muted);margin-bottom:14px">Bottom navigation चे labels बदला</p>
+          <div class="fg"><label>Tab 2 Label</label><input id="navLbl2" value="Under &#8377;999" onchange="updateNavLabel(2,this.value)"></div>
+          <div class="fg"><label>Tab 3 Label</label><input id="navLbl3" value="Filter" onchange="updateNavLabel(3,this.value)"></div>
+          <div class="fg"><label>Tab 4 Label</label><input id="navLbl4" value="Wallet" onchange="updateNavLabel(4,this.value)"></div>
+          <button class="btn-primary" onclick="toast('Nav labels saved!')">&#128190; Save Labels</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /adm-body -->
+</div><!-- /scrAdmin -->
+
+</div><!-- /app -->
+<script>
+// ════════════════════════════════════════
+// FIREBASE CONFIG
+// ════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyAQDtFuBIuwAY7-Xm0RTfrpV419H3IiW1U",
+  authDomain: "naari-fashion-19230.firebaseapp.com",
+  databaseURL: "https://naari-fashion-19230-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "naari-fashion-19230",
+  storageBucket: "naari-fashion-19230.firebasestorage.app",
+  messagingSenderId: "69416531529",
+  appId: "1:69416531529:web:ccaffc10948318bf92b198",
+  measurementId: "G-HVZWX05JT6"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+const S={
+  user:null, isAdmin:false,
+  cart:[], wish:[], orders:[],
+  curProd:null, curCat:'all',
+  coup:null,
+  pendImgs:[],
+  banIdx:0, banTimer:null,
+  dIdx:0,
+  cImgs:{all:null,saree:null,kurti:null,party:null,daily:null,new:null},
+  banners:[
+    {img:null,title:'MIN. 60% OFF',sub:'Built For Comfort',badge:'Wishlist Now',bg:'linear-gradient(135deg,#1a1a2e,#16213e)',em:'🥻',brands:['Spykar','Pepe Jeans','& More']},
+    {img:null,title:'New Arrivals',sub:'Kurtis & Party Wear',badge:'Shop Now',bg:'linear-gradient(135deg,#2d1b69,#11998e)',em:'👗',brands:['New Collection']},
+    {img:null,title:'Festival Special',sub:'Saree Collection — 40% Off',badge:'Buy Now',bg:'linear-gradient(135deg,#c0392b,#7b1a1a)',em:'✨',brands:['Festive Wear']},
+  ],
+  brands:[
+    {img:null,title:'New Launches',sub:'Feels Like Nothing, Looks Like Everything',brand:'blissclub',em:'👗'},
+    {img:null,title:'Min. 65% Off',sub:'Own Your Unique Style',brand:'Naari Exclusive',em:'🥻'},
+    {img:null,title:'Festival Wear',sub:'Ethnic Collection 2025',brand:'Naari Bridal',em:'✨'},
+    {img:null,title:'Daily Comfort',sub:'All Day Comfort',brand:'Naari Daily',em:'☀️'},
+  ],
+  prods:[
+    {id:1,name:'Banarasi Silk Saree',brand:'Naari Exclusive',cat:'saree',price:1299,mrp:2499,stock:15,desc:'Pure Banarasi silk saree from Varanasi. Heavy border, vibrant colors. Perfect for festivals and weddings.',em:'🥻',imgs:[],isNew:true,rating:4.8,reviews:124},
+    {id:2,name:'Chanderi Cotton Saree',brand:'Naari Cotton',cat:'saree',price:799,mrp:1299,stock:8,desc:'Light Chanderi cotton saree. Comfortable for daily wear, easy to drape.',em:'🌸',imgs:[],isNew:false,rating:4.5,reviews:89},
+    {id:3,name:'Anarkali Kurti Set',brand:'Naari Kurti',cat:'kurti',price:899,mrp:1599,stock:22,desc:'3-piece set: Kurti + Palazzo + Dupatta. Perfect for office and casual occasions.',em:'👗',imgs:[],isNew:true,rating:4.7,reviews:203},
+    {id:4,name:'Printed Rayon Kurti',brand:'Naari Daily',cat:'kurti',price:449,mrp:799,stock:45,desc:'Floral printed rayon kurti. Comfortable fabric, easy care. Best for daily wear.',em:'🌺',imgs:[],isNew:false,rating:4.3,reviews:567},
+    {id:5,name:'Lehenga Choli Set',brand:'Naari Bridal',cat:'party',price:2499,mrp:4999,stock:5,desc:'Heavy embroidery lehenga with dupatta. Fully stitched. Perfect for weddings and receptions.',em:'✨',imgs:[],isNew:true,rating:4.9,reviews:41},
+    {id:6,name:'Georgette Floor Gown',brand:'Naari Party',cat:'party',price:1599,mrp:2999,stock:12,desc:'Elegant floor-length georgette gown with lace detail. Ideal for parties and receptions.',em:'💫',imgs:[],isNew:false,rating:4.6,reviews:78},
+    {id:7,name:'Cotton Palazzo Set',brand:'Naari Daily',cat:'daily',price:599,mrp:999,stock:50,desc:'Super comfortable cotton palazzo set. Machine washable. Great for home and outings.',em:'☀️',imgs:[],isNew:false,rating:4.4,reviews:312},
+    {id:8,name:'Ethnic Sharara Set',brand:'Naari New',cat:'new',price:1099,mrp:1999,stock:18,desc:'Trendy sharara set with embroidery work. From the new collection. Great for parties and functions.',em:'🆕',imgs:[],isNew:true,rating:4.8,reviews:56},
+  ],
+  coupons:[
+    {code:'NAARI20',disc:20,min:500},
+    {code:'HOLI30',disc:30,min:1000},
+    {code:'WELCOME10',disc:10,min:0},
+  ],
+};
+
+// ── UTILS ──
+const $=id=>document.getElementById(id);
+const toast=(m,d=2100)=>{const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),d);};
+const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
+const off=(p,m)=>Math.round((1-p/m)*100);
+const cLbl=c=>({all:'All',saree:'Saree',kurti:'Kurti',party:'Party Wear',daily:'Daily Wear',new:'New Arrivals'}[c]||c);
+const cEm=c=>({all:'🛍️',saree:'🥻',kurti:'👗',party:'✨',daily:'☀️',new:'🆕'}[c]||'🛍️');
+
+// ── PAGE SWITCHES ──
+function showScr(id){['scrAuth','scrUser','scrAdmin'].forEach(s=>{const el=$(s);if(el)el.classList.toggle('on',s===id);});}
+
+const PANELS=['pHome','pDetail','pCart','pCheckout','pOrders','pWish','pProfile','pBudget','pSupport','pBigSale'];
+function showPanel(id){
+  PANELS.forEach(p=>{const el=$(p);if(el)el.classList.toggle('on',p===id);});
+  if(id==='pHome'){clearBanTimer();startBanTimer();}
+  if(id!=='pHome'){clearBanTimer();}
+}
+
+// ── AUTH ──
+let _adminTaps=0,_adminTapTimer=null;
+function adminTapCount(){
+  _adminTaps++;
+  clearTimeout(_adminTapTimer);
+  if(_adminTaps>=5){_adminTaps=0;showAdminCard();return;}
+  _adminTapTimer=setTimeout(()=>{_adminTaps=0;},2000);
+}
+function showAdminCard(){
+  ['cLogin','cSignup','cAdmin'].forEach(c=>{const el=$(c);if(el)el.classList.remove('on');});
+  $('cAdmin').classList.add('on');
+}
+function switchAuthTab(tab){
+  ['cLogin','cSignup','cAdmin'].forEach(c=>{const el=$(c);if(el)el.classList.remove('on');});
+  if(tab==='register'){
+    $('cSignup').classList.add('on');
+  } else {
+    $('cLogin').classList.add('on');
+  }
+}
+// Legacy compat
+function showCard(id){
+  if(id==='cLogin') switchAuthTab('login');
+  else if(id==='cSignup') switchAuthTab('register');
+  else if(id==='cAdmin') showAdminCard();
+}
+function doLogin(){
+  const e=$('liE').value.trim(), p=$('liP').value.trim();
+  if(!e){toast('⚠️ Mobile किंवा Email टाका');return;}
+  if(!p){toast('⚠️ Password टाका');return;}
+  if(p.length<4){toast('⚠️ Password 4 अंकी असावा');return;}
+
+  const btn=document.querySelector('#cLogin .btn-primary');
+  btn.textContent='Login होत आहे...';btn.disabled=true;
+
+  const isPhone=!e.includes('@');
+  const lookupPath = isPhone ? 'usersByPhone/'+e : 'usersByEmail/'+btoa(e).replace(/=/g,'');
+
+  db.ref(lookupPath).once('value').then(snap=>{
+    const data=snap.val();
+    if(!data){
+      btn.textContent='Login';btn.disabled=false;
+      toast('❌ Account सापडले नाही. आधी Register करा');
+      return;
+    }
+    if(data.password !== btoa(p)){
+      btn.textContent='Login';btn.disabled=false;
+      toast('❌ Password चुकीचा आहे');
+      return;
+    }
+    S.user={name:data.name, phone:data.phone, email:data.email, uid:data.uid};
+    btn.textContent='Login';btn.disabled=false;
+    launchUser();
+  }).catch(()=>{
+    btn.textContent='Login';btn.disabled=false;
+    toast('❌ Network error. पुन्हा प्रयत्न करा');
+  });
+}
+
+function firebaseLogin(){}  // kept for compat, unused
+
+function doSignup(){
+  const n=$('suN').value.trim(),
+        ph=$('suPh').value.trim(),
+        em=$('suE').value.trim(),
+        pw=$('suP').value.trim();
+
+  if(!n){toast('⚠️ पूर्ण नाव टाका');return;}
+  if(!ph||ph.length<10){toast('⚠️ 10 अंकी Mobile number टाका');return;}
+  if(!/^\d{10}$/.test(ph)){toast('⚠️ फक्त 10 numbers टाका');return;}
+  if(!em||!em.includes('@')){toast('⚠️ valid Email टाका');return;}
+  if(!pw||pw.length!==4){toast('⚠️ Password नक्की 4 अंकी असावा');return;}
+
+  const btn=document.querySelector('#cSignup .btn-primary');
+  btn.textContent='Account तयार होत आहे...';btn.disabled=true;
+
+  const emailKey = btoa(em).replace(/=/g,'');
+  const uid = 'U'+Date.now();
+
+  // Check phone duplicate
+  db.ref('usersByPhone/'+ph).once('value').then(snap=>{
+    if(snap.val()){
+      btn.textContent='Create Account';btn.disabled=false;
+      toast('⚠️ हा Mobile number आधीच registered आहे');
+      return;
+    }
+    // Check email duplicate
+    db.ref('usersByEmail/'+emailKey).once('value').then(snap2=>{
+      if(snap2.val()){
+        btn.textContent='Create Account';btn.disabled=false;
+        toast('⚠️ हा Email आधीच registered आहे');
+        return;
+      }
+      const userData={name:n,phone:ph,email:em,uid:uid,password:btoa(pw),createdAt:Date.now()};
+      const updates={};
+      updates['users/'+uid]=userData;
+      updates['usersByPhone/'+ph]=userData;
+      updates['usersByEmail/'+emailKey]=userData;
+      db.ref().update(updates).then(()=>{
+        btn.textContent='Create Account';btn.disabled=false;
+        $('suN').value='';$('suPh').value='';$('suE').value='';$('suP').value='';
+        toast('✅ Account तयार झाले! आता Login करा');
+        switchAuthTab('login');
+      }).catch(err=>{
+        btn.textContent='Create Account';btn.disabled=false;
+        toast('❌ DB Error: '+err.message);
+      });
+    }).catch(()=>{
+      btn.textContent='Create Account';btn.disabled=false;
+      toast('❌ Network error. पुन्हा प्रयत्न करा');
+    });
+  }).catch(()=>{
+    btn.textContent='Create Account';btn.disabled=false;
+    toast('❌ Network error. पुन्हा प्रयत्न करा');
+  });
+}
+function doAdminLogin(){
+  const savedPwd = localStorage.getItem('adminPassword') || 'admin';
+  if($('adI').value==='admin'&&$('adP').value===savedPwd){
+    S.isAdmin=true;showScr('scrAdmin');
+    updDash();renderAPList();renderAOrders();renderACoupons();renderAStock();
+    buildBanUpList();buildCiruRow();buildBcuGrid();
+  } else toast('❌ Invalid credentials');
+}
+function changeAdminPassword(){
+  const savedPwd = localStorage.getItem('adminPassword') || 'admin';
+  const cur=$('sCurP').value, np=$('sNewP').value, cp=$('sConP').value;
+  if(!cur||!np||!cp){toast('⚠️ सर्व fields भरा');return;}
+  if(cur!==savedPwd){toast('❌ Current password चुकीचा आहे');return;}
+  if(np!==cp){toast('⚠️ New passwords जुळत नाहीत');return;}
+  if(np.length<4){toast('⚠️ Password किमान 4 characters असावा');return;}
+  localStorage.setItem('adminPassword',np);
+  $('sCurP').value='';$('sNewP').value='';$('sConP').value='';
+  toast('✅ Password यशस्वीरित्या बदलला!');
+}
+function launchUser(){
+  showScr('scrUser');
+  $('profN').textContent=S.user.name;
+  $('profP').textContent=S.user.phone;
+  setTimeout(initSupportChat, 500);
+  $('locTxt').textContent=S.user.name+' — Pune, Maharashtra';
+  $('waFab').classList.add('on');
+  buildCircles();buildBanners();buildBrands();renderProds();
+  showPanel('pHome');
+}
+function doLogout(){
+  S.user=null;S.isAdmin=false;
+  showScr('scrAuth');
+  $('waFab').classList.remove('on');
+  clearBanTimer();
+  showCard('cLogin');
+}
+
+// Toggle Profile Dropdown Menu
+function toggleProfileMenu(){
+  const dropdown = $('profDropdown');
+  dropdown.classList.toggle('show');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = $('profDropdown');
+  const btn = $('profIconBtn');
+  if(dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+    dropdown.classList.remove('show');
+  }
+});
+
+// Switch from Admin to User App
+function goToUserApp(){
+  if(!S.user) S.user = {name: 'Admin User', phone: '9876543210'};
+  showScr('scrUser');
+  $('profN').textContent = S.user.name;
+  $('profP').textContent = S.user.phone;
+  $('locTxt').textContent = S.user.name + ' — Pune, Maharashtra';
+  $('waFab').classList.add('on');
+  buildCircles();buildBanners();buildBrands();renderProds();
+  showPanel('pHome');
+}
+
+// Switch from User to Admin Panel
+function goToAdminPanel(){
+  // Show admin login modal instead of direct access
+  toggleProfileMenu();
+  showAdminModal();
+}
+
+function showAdminModal(){
+  // Create overlay modal for admin password
+  let modal = $('adminModal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'adminModal';
+    modal.style.cssText = `
+      position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;
+      display:flex;align-items:center;justify-content:center;padding:20px;
+    `;
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:16px;padding:28px 22px;width:100%;max-width:320px;box-shadow:0 10px 40px rgba(0,0,0,0.3)">
+        <div style="font-size:1.1rem;font-weight:800;color:#1c1c1c;margin-bottom:4px">⚙️ Admin Access</div>
+        <div style="font-size:.75rem;color:#878787;margin-bottom:18px">Admin ID आणि Password टाका</div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#878787;display:block;margin-bottom:4px">Admin ID</label>
+          <input id="modalAdI" placeholder="admin" style="width:100%;padding:10px 12px;border:1.5px solid #eaeaea;border-radius:8px;font-size:.86rem;outline:none;background:#fafafa;color:#1c1c1c;font-family:inherit">
+        </div>
+        <div style="margin-bottom:18px">
+          <label style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#878787;display:block;margin-bottom:4px">Password</label>
+          <input id="modalAdP" placeholder="••••" type="password" maxlength="20" style="width:100%;padding:10px 12px;border:1.5px solid #eaeaea;border-radius:8px;font-size:.86rem;outline:none;background:#fafafa;color:#1c1c1c;font-family:inherit" onkeydown="if(event.key==='Enter')doModalAdminLogin()">
+        </div>
+        <button onclick="doModalAdminLogin()" style="width:100%;padding:12px;background:#ff3f6c;color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;margin-bottom:10px">Login as Admin</button>
+        <button onclick="closeAdminModal()" style="width:100%;padding:10px;background:none;border:1.5px solid #eaeaea;color:#878787;border-radius:8px;font-size:.82rem;cursor:pointer">Cancel</button>
+      </div>
+    `;
+    document.getElementById('app').appendChild(modal);
+  } else {
+    modal.style.display='flex';
+  }
+  setTimeout(()=>{ const el=$('modalAdI'); if(el) el.focus(); },100);
+}
+
+function closeAdminModal(){
+  const modal=$('adminModal');
+  if(modal) modal.style.display='none';
+  if($('modalAdI')) $('modalAdI').value='';
+  if($('modalAdP')) $('modalAdP').value='';
+}
+
+function doModalAdminLogin(){
+  const id=$('modalAdI').value.trim();
+  const pw=$('modalAdP').value.trim();
+  const savedPwd=localStorage.getItem('adminPassword')||'admin';
+  if(id==='admin' && pw===savedPwd){
+    closeAdminModal();
+    S.isAdmin=true;
+    showScr('scrAdmin');
+    $('waFab').classList.remove('on');
+    updDash();renderAPList();renderAOrders();renderACoupons();renderAStock();
+    buildBanUpList();buildCiruRow();buildBcuGrid();
+  } else {
+    // Shake effect
+    const box=$('adminModal').querySelector('div');
+    box.style.animation='shake .35s ease';
+    setTimeout(()=>box.style.animation='',400);
+    toast('❌ ID किंवा Password चुकीचा आहे');
+  }
+}
+
+// ── CIRCLES ──
+const CATS=[{id:'all',lbl:'All',em:'🛍️'},{id:'saree',lbl:'Saree',em:'🥻'},{id:'kurti',lbl:'Kurti',em:'👗'},{id:'party',lbl:'Party',em:'✨'},{id:'daily',lbl:'Daily',em:'☀️'},{id:'new',lbl:'New',em:'🆕'}];
+function buildCircles(){
+  $('circlesRow').innerHTML=CATS.map(c=>`
+    <div class="ci-item ${c.id===S.curCat?'on':''}" onclick="setCat(this,'${c.id}')">
+      <div class="ci-ring">${S.cImgs[c.id]?`<img src="${S.cImgs[c.id]}" alt="${c.lbl}">`:`${c.em}`}</div>
+      <div class="ci-lbl">${c.lbl}</div>
+    </div>`).join('');
+}
+function setCat(el,cat){
+  S.curCat=cat;
+  document.querySelectorAll('.ci-item').forEach(c=>c.classList.remove('on'));
+  if(el)el.classList.add('on');
+  const hs={all:'ALL PRODUCTS',saree:'SAREES',kurti:'KURTIS',party:'PARTY WEAR',daily:'DAILY WEAR',new:'NEW ARRIVALS'};
+  $('prodH').innerHTML=`${cEm(cat)} <span>${hs[cat]||'PRODUCTS'}</span>`;
+  renderProds();
+  document.querySelectorAll('.ct').forEach((t,i)=>{const cats=['all','saree','kurti','party','daily','new'];t.classList.toggle('on',cats[i]===cat);});
+}
+function setCT(btn,cat){
+  document.querySelectorAll('.ct').forEach(t=>t.classList.remove('on'));btn.classList.add('on');
+  S.curCat=cat;
+  const hs={all:'ALL PRODUCTS',saree:'SAREES',kurti:'KURTIS',party:'PARTY WEAR',daily:'DAILY WEAR',new:'NEW ARRIVALS'};
+  $('prodH').innerHTML=`${cEm(cat)} <span>${hs[cat]||'PRODUCTS'}</span>`;
+  renderProds();buildCircles();
+}
+function resetCat(){setCat(null,'all');buildCircles();}
+
+// ── BANNERS ──
+function buildBanners(){
+  const track=$('banTrack'),dots=$('banDots');
+  if(!track||!dots)return;
+  track.innerHTML='';dots.innerHTML='';
+  S.banners.forEach((b,i)=>{
+    const sl=document.createElement('div');
+    sl.className='ban-slide';
+    const hasImg=!!b.img;
+    sl.innerHTML=`
+      ${hasImg?`<img class="ban-slide-img" src="${b.img}" alt="${b.title}">`:`<div class="fallback"><div class="fallbg" style="background:${b.bg}">${b.em}</div></div>`}
+      <div class="ban-overlay">
+        <div class="ban-txt">
+          <p style="font-size:.66rem;color:rgba(255,255,255,.75);margin-bottom:2px">${b.sub}</p>
+          <h3>${b.title}</h3>
+          <div class="ban-brands">${(b.brands||[]).map(br=>`<span class="ban-bc">${br}</span>`).join('')}</div>
+        </div>
+        <button class="ban-cta">🤍 ${b.badge} <span class="arr">›</span></button>
+      </div>`;
+    track.appendChild(sl);
+    const dot=document.createElement('button');
+    dot.className='bdot'+(i===0?' on':'');
+    dot.onclick=()=>banGo(i);
+    dots.appendChild(dot);
+  });
+  banGo(0);startBanTimer();
+}
+function banGo(i){
+  const n=S.banners.length;
+  S.banIdx=(i+n)%n;
+  const t=$('banTrack');if(!t)return;
+  t.style.transform=`translateX(-${S.banIdx*100}%)`;
+  const dots=$('banDots');if(!dots)return;
+  dots.querySelectorAll('.bdot').forEach((d,j)=>d.classList.toggle('on',j===S.banIdx));
+}
+function startBanTimer(){clearBanTimer();S.banTimer=setInterval(()=>banGo(S.banIdx+1),3000);}
+function clearBanTimer(){if(S.banTimer){clearInterval(S.banTimer);S.banTimer=null;}}
+
+// ── BRANDS ──
+function buildBrands(){
+  $('brandGrid').innerHTML=S.brands.map((b,i)=>`
+    <div class="bc">
+      <div class="bc-img">${b.img?`<img src="${b.img}" alt="${b.brand}">`:`${b.em}`}</div>
+      <div class="bc-body">
+        <div class="bc-title">${b.title}</div>
+        <div class="bc-sub">${b.sub}</div>
+        <div class="bc-brand"><span>${b.em}</span><span>${b.brand}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+// ── PRODUCTS ──
+function getProds(cat,q,maxPrice){
+  const mp = (maxPrice !== undefined) ? maxPrice : (activeMaxPrice || 999999);
+  return S.prods.filter(p=>{
+    const co=(!cat||cat==='all')||p.cat===cat;
+    const qo=!q||p.name.toLowerCase().includes(q.toLowerCase())||p.brand.toLowerCase().includes(q.toLowerCase());
+    const po = p.price <= mp;
+    return co&&qo&&po;
+  });
+}
+function pcHTML(p){
+  const o=off(p.price,p.mrp),iw=S.wish.some(w=>w.id===p.id),mi=p.imgs&&p.imgs[0];
+  return `<div class="pcard" onclick="openProd(${p.id})">
+    <div class="pcard-img">
+      ${mi?`<img src="${mi}" alt="${p.name}" loading="lazy">`:`<div class="pfall">${p.em}</div>`}
+      <div class="pbadges">
+        ${o>=20?`<span class="pb pb-sale">${o}% OFF</span>`:''}
+        ${p.isNew&&p.stock>5?`<span class="pb pb-new">NEW</span>`:''}
+        ${p.stock<=5&&p.stock>0?`<span class="pb pb-low">LOW STOCK</span>`:''}
+      </div>
+      <button class="pwish" onclick="event.stopPropagation();toggleWish(${p.id})">${iw?'❤️':'🤍'}</button>
+    </div>
+    <div class="pinfo">
+      <div class="p-brand">${p.brand}</div>
+      <div class="p-name">${p.name}</div>
+      <div class="p-price"><span class="p-sp">${fmt(p.price)}</span><span class="p-mrp">${fmt(p.mrp)}</span><span class="p-off">(${o}% off)</span></div>
+      <div class="p-rat"><div class="rat-chip">⭐ ${p.rating} <span style="color:#aaa;font-weight:400">(${p.reviews})</span></div></div>
+    </div>
+  </div>`;
+}
+function renderProds(){
+  const ps=getProds(S.curCat, '', activeMaxPrice);
+  $('prodGrid').innerHTML=ps.length?ps.map(pcHTML).join(''):`<div class="empty" style="grid-column:span 2"><div class="empty-ico">🔍</div><div class="empty-t">No products found</div></div>`;
+}
+let _srchCat = 'all';
+
+function doSearch(){
+  const inp = $('si2');
+  const q = inp ? inp.value.trim() : '';
+  const clearBtn = $('siClear');
+  const countEl = $('srchCount');
+  const emptyEl = $('srchEmpty');
+  const emptyMsg = $('srchEmptyMsg');
+  const grid = $('srchGrid');
+  const sugBox = $('srchSuggestBox');
+  
+  // Show/hide clear button
+  if(clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+  
+  // Sync to top bar input
+  if($('si1') && $('si1').value !== q) $('si1').value = q;
+  
+  if(!q && _srchCat === 'all'){
+    // No query - show suggestions
+    if(sugBox) sugBox.style.display = 'block';
+    if(grid) grid.innerHTML = '';
+    if(countEl) countEl.textContent = '';
+    if(emptyEl) emptyEl.style.display = 'none';
+    return;
+  }
+  
+  // Hide suggestions when searching
+  if(sugBox) sugBox.style.display = 'none';
+  
+  if(!q && _srchCat !== 'all'){
+    // Category selected, no text - show category products
+    const all = getProds(_srchCat,'',999999);
+    if(grid) grid.innerHTML = all.map(pcHTML).join('');
+    if(countEl) countEl.textContent = all.length + ' products';
+    if(emptyEl) emptyEl.style.display = 'none';
+    return;
+  }
+  
+  const ps = getProds(_srchCat === 'all' ? null : _srchCat, q, 999999);
+  
+  if(ps.length === 0){
+    if(grid) grid.innerHTML = '';
+    if(emptyEl){ emptyEl.style.display = 'block'; }
+    if(emptyMsg) emptyMsg.textContent = q ? '"' + q + '" सापडला नाही' : 'या category मध्ये products नाहीत';
+    if(countEl) countEl.textContent = '';
+  } else {
+    if(grid) grid.innerHTML = ps.map(pcHTML).join('');
+    if(emptyEl) emptyEl.style.display = 'none';
+    if(countEl) countEl.textContent = ps.length + ' products सापडले' + (q ? ' "' + q + '"' : '');
+  }
+}
+
+function doSearchInline(){
+  // Sync si1 value to si2 and trigger search
+  const v = $('si1') ? $('si1').value : '';
+  if($('si2')) $('si2').value = v;
+  doSearch();
+}
+
+function focusSearch(){
+  const overlay = document.getElementById('searchOverlay');
+  if(overlay){
+    overlay.style.display = 'flex';
+    // Hide suggest box, show all initially
+    setTimeout(()=>{
+      const inp = $('si2');
+      if(inp){ inp.focus(); }
+      // Show all products on open
+      const q = inp ? inp.value.trim() : '';
+      if(!q) showSuggestions();
+      else doSearch();
+    }, 80);
+  }
+}
+
+function closeSearch(){
+  const overlay = document.getElementById('searchOverlay');
+  if(overlay) overlay.style.display = 'none';
+  if($('si1')) $('si1').value = '';
+  if($('si2')) $('si2').value = '';
+  if($('siClear')) $('siClear').style.display = 'none';
+  if($('srchCount')) $('srchCount').textContent = '';
+  _srchCat = 'all';
+  document.querySelectorAll('.srch-chip').forEach((c,i)=>c.classList.toggle('on',i===0));
+}
+
+function showSuggestions(){
+  // Show suggestions box, hide results
+  const sugBox = $('srchSuggestBox');
+  const grid = $('srchGrid');
+  const empty = $('srchEmpty');
+  if(sugBox) sugBox.style.display = 'block';
+  if(grid) grid.innerHTML = '';
+  if(empty) empty.style.display = 'none';
+  if($('srchCount')) $('srchCount').textContent = '';
+}
+
+function setSearch(q){
+  if($('si2')){ $('si2').value = q; }
+  if($('si1')){ $('si1').value = q; }
+  doSearch();
+}
+
+function clearSearch(){
+  if($('si2')) { $('si2').value = ''; $('si2').focus(); }
+  if($('si1')) $('si1').value = '';
+  if($('siClear')) $('siClear').style.display = 'none';
+  _srchCat = 'all';
+  document.querySelectorAll('.srch-chip').forEach((c,i)=>c.classList.toggle('on',i===0));
+  showSuggestions(); // Show suggestions again after clear
+}
+
+function searchCat(cat, btn){
+  _srchCat = cat;
+  document.querySelectorAll('.srch-chip').forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');
+  doSearch();
+}
+
+// ── PRODUCT DETAIL ──
+function openProd(id){
+  const p=S.prods.find(x=>x.id===id);if(!p)return;
+  // Close search overlay if open
+  const ov=document.getElementById('searchOverlay');if(ov&&ov.style.display!=='none')ov.style.display='none';
+  S.curProd=p;S.dIdx=0;
+  $('dhTtl').textContent=p.name;
+  buildDSlider(p);buildDBody(p);
+  showPanel('pDetail');
+}
+function buildDSlider(p){
+  const imgs=p.imgs&&p.imgs.length?p.imgs:[null];
+  $('dTrack').innerHTML=imgs.map(img=>`<div class="d-slide">${img?`<img src="${img}" alt="">`:`${p.em}`}</div>`).join('');
+  $('dThumbs').innerHTML=imgs.map((img,i)=>`<div class="dthumb ${i===0?'on':''}" onclick="dGo(${i})">${img?`<img src="${img}" alt="">`:`${p.em}`}</div>`).join('');
+  dGo(0);
+}
+function dGo(i){
+  const p=S.curProd,n=Math.max(1,p.imgs&&p.imgs.length?p.imgs.length:1);
+  S.dIdx=(i+n)%n;
+  $('dTrack').style.transform=`translateX(-${S.dIdx*100}%)`;
+  document.querySelectorAll('#dThumbs .dthumb').forEach((t,j)=>t.classList.toggle('on',j===S.dIdx));
+}
+function dSlide(d){if(S.curProd)dGo(S.dIdx+d);}
+function buildDBody(p){
+  const o=off(p.price,p.mrp),iw=S.wish.some(w=>w.id===p.id);
+  $('dBody').innerHTML=`
+    <div class="d-brand">${p.brand}</div>
+    <div class="d-name">${p.name}</div>
+    <div class="p-rat" style="margin-bottom:8px"><div class="rat-chip">⭐ ${p.rating} (${p.reviews} ratings)</div></div>
+    <div class="d-price-row"><span class="d-sp">${fmt(p.price)}</span><span class="d-mrp">${fmt(p.mrp)}</span><span class="d-off">(${o}% off)</span></div>
+    <div class="size-hd">Select Size <span>Size Guide</span></div>
+    <div class="sizes">${['XS','S','M','L','XL','XXL'].map(s=>`<div class="sz ${s==='M'?'on':''}" onclick="selSz(this)">${s}</div>`).join('')}</div>
+    <div class="d-tabs">
+      <button class="dtb on" onclick="showDPane(this,'dp1')">Description</button>
+      <button class="dtb" onclick="showDPane(this,'dp2')">Reviews</button>
+      <button class="dtb" onclick="showDPane(this,'dp3')">Delivery</button>
+    </div>
+    <div class="dpane on" id="dp1">${p.desc}</div>
+    <div class="dpane" id="dp2">
+      <div class="rv"><div class="rv-top"><span class="rv-name">Priya Patil</span><span>⭐⭐⭐⭐⭐</span></div><div style="font-size:.76rem;color:var(--muted)">Very beautiful! Best fabric quality 💕</div></div>
+      <div class="rv"><div class="rv-top"><span class="rv-name">Sunita Deshmukh</span><span>⭐⭐⭐⭐</span></div><div style="font-size:.76rem;color:var(--muted)">Nice color, fast delivery. Perfect fit.</div></div>
+      <div class="rv"><div class="rv-top"><span class="rv-name">Anita Joshi</span><span>⭐⭐⭐⭐⭐</span></div><div style="font-size:.76rem;color:var(--muted)">Wore it to a wedding — everyone loved it!</div></div>
+    </div>
+    <div class="dpane" id="dp3" style="line-height:2">
+      🚚 <b>Delivery:</b> 3–7 working days<br>
+      📦 <b>Free Shipping:</b> On orders above ₹799<br>
+      🔄 <b>Return:</b> 7-day easy returns<br>
+      ✅ <b>COD:</b> Available<br>
+      🔒 <b>100%</b> Authentic Products
+    </div>`;
+  $('dSticky').innerHTML=`
+    <button class="dwish ${iw?'on':''}" id="dWishBtn" onclick="toggleDWish()">${iw?'❤️':'🤍'}</button>
+    <button class="btn-cart-d" onclick="addToCart(${p.id})">🛒 Add to Cart</button>
+    <button class="btn-buy-d" onclick="buyNow()">⚡ Buy Now</button>`;
+}
+function selSz(el){document.querySelectorAll('.sz').forEach(s=>s.classList.remove('on'));el.classList.add('on');}
+function showDPane(btn,id){
+  document.querySelectorAll('.dtb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  ['dp1','dp2','dp3'].forEach(p=>{const el=$(p);if(el)el.classList.toggle('on',p===id);});
+}
+
+// ── CART ──
+function addToCart(id){
+  const p=S.prods.find(x=>x.id===id);if(!p)return;
+  const ex=S.cart.find(x=>x.id===id);
+  if(ex)ex.qty++;else S.cart.push({...p,qty:1});
+  updBadges();toast('✅ Added to cart!');
+}
+function buyNow(){if(S.curProd)addToCart(S.curProd.id);showPanel('pCart');renderCart();}
+function updBadges(){
+  const n=S.cart.reduce((s,i)=>s+i.qty,0);
+  ['cBadge','cBadge2','cBadge3'].forEach(id=>{const el=$(id);if(el)el.textContent=n;});
+}
+function renderCart(){
+  const ci=$('cartItems'),cb=$('cartBelow');
+  if(!S.cart.length){
+    ci.innerHTML=`<div class="empty"><div class="empty-ico">🛒</div><div class="empty-t">Your cart is empty</div><button class="btn-outline" onclick="showPanel('pHome')">Start Shopping</button></div>`;
+    cb.innerHTML='';return;
+  }
+  ci.innerHTML=S.cart.map(item=>{
+    const mi=item.imgs&&item.imgs[0];
+    return `<div class="cart-item">
+      <div class="ci-img">${mi?`<img src="${mi}" alt="">`:`${item.em}`}</div>
+      <div class="ci-info">
+        <div class="ci-brand">${item.brand}</div>
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-size">Size: M</div>
+        <div class="ci-price">${fmt(item.price)}</div>
+        <div class="qty">
+          <button class="qb" onclick="updQ(${item.id},-1)">−</button>
+          <span class="qn">${item.qty}</span>
+          <button class="qb" onclick="updQ(${item.id},1)">+</button>
+          <button class="c-del" onclick="remCart(${item.id})">Remove</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  const sub=S.cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const disc=S.coup?Math.round(sub*S.coup.disc/100):0;
+  const del=sub>=799?0:60;
+  const tot=sub-disc+del;
+  cb.innerHTML=`
+    <div class="coup-row">
+      <input id="cInp" placeholder="Coupon code (NAARI20)" type="text">
+      <button class="apply-btn" onclick="apCoupCart()">Apply</button>
+    </div>
+    <div id="cMsg" class="coup-msg"></div>
+    <div class="cart-sum">
+      <div class="sr"><span>Subtotal</span><span>${fmt(sub)}</span></div>
+      ${disc?`<div class="sr" style="color:var(--green)"><span>🏷️ Discount (${S.coup.code})</span><span>−${fmt(disc)}</span></div>`:''}
+      <div class="sr"><span>Delivery</span><span>${del===0?`<span style="color:var(--green)">FREE</span>`:fmt(del)}</span></div>
+      <div class="sr tot"><span>Total</span><span>${fmt(tot)}</span></div>
+    </div>
+    <div style="padding:8px 10px 10px"><button class="btn-primary" onclick="goCheckout()">Proceed to Checkout →</button></div>`;
+}
+function updQ(id,d){const i=S.cart.find(x=>x.id===id);if(!i)return;i.qty+=d;if(i.qty<=0)S.cart=S.cart.filter(x=>x.id!==id);updBadges();renderCart();}
+function remCart(id){S.cart=S.cart.filter(x=>x.id!==id);updBadges();renderCart();}
+function apCoupCart(){
+  const c=S.coupons.find(x=>x.code===($('cInp')?$('cInp').value.toUpperCase().trim():''));
+  const m=$('cMsg');if(!m)return;
+  if(!c){m.innerHTML='<span style="color:var(--red)">❌ Invalid coupon code</span>';return;}
+  const sub=S.cart.reduce((s,i)=>s+i.price*i.qty,0);
+  if(sub<c.min){m.innerHTML=`<span style="color:var(--red)">⚠️ Minimum order ${fmt(c.min)} required</span>`;return;}
+  S.coup=c;m.innerHTML=`<span style="color:var(--green)">✅ ${c.disc}% discount applied!</span>`;renderCart();
+}
+function apCoup(){
+  const c=S.coupons.find(x=>x.code===($('ckCoup')?$('ckCoup').value.toUpperCase().trim():''));
+  const m=$('ckCoupMsg');if(!m)return;
+  if(!c){m.innerHTML='<span style="color:var(--red)">❌ Invalid coupon</span>';return;}
+  S.coup=c;m.innerHTML=`<span style="color:var(--green)">✅ ${c.disc}% discount applied!</span>`;buildCkSum();
+}
+function goCheckout(){if(!S.cart.length){toast('⚠️ Cart is empty');return;}buildCkSum();showPanel('pCheckout');}
+function buildCkSum(){
+  const sub=S.cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const disc=S.coup?Math.round(sub*S.coup.disc/100):0;
+  const del=sub>=799?0:60,tot=sub-disc+del;
+  $('ckSumWrap').innerHTML=`<div class="cart-sum">
+    <div class="sr"><span>Subtotal</span><span>${fmt(sub)}</span></div>
+    ${disc?`<div class="sr" style="color:var(--green)"><span>Discount</span><span>−${fmt(disc)}</span></div>`:''}
+    <div class="sr"><span>Delivery</span><span>${del===0?`<span style="color:var(--green)">FREE</span>`:fmt(del)}</span></div>
+    <div class="sr tot"><span>Total Amount</span><span>${fmt(tot)}</span></div>
+  </div>`;
+}
+function selPay(el){document.querySelectorAll('.pay-opt').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function placeOrder(){
+  if(!$('ckN').value||!$('ckPh').value||!$('ckA').value){toast('⚠️ Please fill all details');return;}
+  const sub=S.cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const disc=S.coup?Math.round(sub*S.coup.disc/100):0;
+  const tot=sub-disc+(sub>=799?0:60);
+  const newOrder = {
+    id:'NF'+Date.now().toString().slice(-6),
+    items:[...S.cart],total:tot,
+    name:$('ckN').value,phone:$('ckPh').value,
+    addr:[$('ckA').value,$('ckC').value,$('ckPn').value].filter(Boolean).join(', '),
+    status:'pending',date:new Date().toLocaleDateString('en-IN'),
+    steps:[true,false,false,false],
+    timestamp: Date.now()
+  };
+  S.orders.unshift(newOrder);
+  // Save order to Firebase
+  saveOrderToFirebase(newOrder);
+  S.cart=[];S.coup=null;updBadges();
+  toast('🎉 Order placed successfully! Thank you!',3000);
+  updDash();renderAOrders();
+  setTimeout(()=>{showPanel('pOrders');loadOrders();},700);
+}
+
+// ── ORDERS ──
+function loadOrders(){
+  const el=$('ordersCont');if(!el)return;
+  if(!S.orders.length){el.innerHTML=`<div class="empty"><div class="empty-ico">📦</div><div class="empty-t">No orders yet</div><button class="btn-outline" onclick="showPanel('pHome')">Start Shopping</button></div>`;return;}
+  const sc={pending:'s-p',processing:'s-pr',shipped:'s-sh',delivered:'s-de'};
+  const sl={pending:'Pending',processing:'Processing',shipped:'Shipped',delivered:'Delivered'};
+  const stp=['Ordered','Processing','Shipped','Delivered'];
+  el.innerHTML=S.orders.map(o=>{
+    const done=o.steps.filter(Boolean).length;
+    const pct=[0,0,33,66,100][done]||0;
+    return `<div class="o-card">
+      <div class="o-hd">
+        <div><div class="o-num">Order #${o.id}</div><div class="o-date">📅 ${o.date} • ${o.items.length} items • ${fmt(o.total)}</div></div>
+        <span class="ostatus ${sc[o.status]}">${sl[o.status]}</span>
+      </div>
+      <div class="o-items">
+        ${o.items.slice(0,2).map(item=>{const mi=item.imgs&&item.imgs[0];return `<div class="oi-row"><div class="oi-img">${mi?`<img src="${mi}" alt="">`:`${item.em}`}</div><div><div class="oi-n">${item.name}</div><div class="oi-s">Qty: ${item.qty} • ${fmt(item.price)}</div></div></div>`;}).join('')}
+        ${o.items.length>2?`<div style="font-size:.68rem;color:var(--muted);padding-top:3px">+${o.items.length-2} more items</div>`:''}
+      </div>
+      <div class="track">
+        <div class="track-lbl">Order Tracking</div>
+        <div class="track-row">
+          <div class="track-fill" style="width:calc(${pct}% * 0.82 + ${pct===0?'0px':'9%'})"></div>
+          ${stp.map((s,i)=>`<div class="ts"><div class="td ${o.steps[i]?'done':o.steps.indexOf(false)===i?'cur':''}">${o.steps[i]?'✓':i+1}</div><div class="tl">${s}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── WISHLIST ──
+function toggleWish(id){
+  const p=S.prods.find(x=>x.id===id);
+  const i=S.wish.findIndex(x=>x.id===id);
+  if(i>=0){S.wish.splice(i,1);toast('Removed from wishlist');}
+  else{S.wish.push(p);toast('❤️ Added to wishlist!');}
+  renderProds();
+  if(S.curProd&&S.curProd.id===id){const b=$('dWishBtn');if(b){const iw=S.wish.some(w=>w.id===id);b.classList.toggle('on',iw);b.textContent=iw?'❤️':'🤍';}}
+}
+function toggleDWish(){if(S.curProd)toggleWish(S.curProd.id);}
+function loadWishlist(){
+  const el=$('wishCont');if(!el)return;
+  if(!S.wish.length){el.innerHTML=`<div class="empty"><div class="empty-ico">🤍</div><div class="empty-t">Your wishlist is empty</div><button class="btn-outline" onclick="showPanel('pHome')">Start Shopping</button></div>`;return;}
+  el.innerHTML=`<div class="pgrid">${S.wish.map(pcHTML).join('')}</div>`;
+}
+
+// ── BOTTOM NAV ──
+function navTo(btn,panel){
+  document.querySelectorAll('.bn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  showPanel(panel);
+  if(panel==='pOrders')loadOrders();
+  if(panel==='pWish')loadWishlist();
+  if(panel==='pBigSale')loadBigSale();
+  if(panel==='pBudget')filterBudget();
+  if(panel==='pSupport')initSupportChat();
+}
+
+// ── ADMIN ──
+function showAt(btn,id){
+  document.querySelectorAll('.at').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  document.querySelectorAll('.asec').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');
+  if(id==='aDash')updDash();
+  if(id==='aProds')renderAPList();
+  if(id==='aOrders')renderAOrders();
+  if(id==='aOffers')renderACoupons();
+  if(id==='aStock')renderAStock();
+  if(id==='aBanners'){buildBanUpList();buildCiruRow();buildBcuGrid();}
+}
+function updDash(){
+  const sal=S.orders.reduce((s,o)=>s+o.total,0);
+  $('aStats').innerHTML=`
+    <div class="stat"><div class="stat-v">${fmt(sal)}</div><div class="stat-l">Total Sales</div></div>
+    <div class="stat"><div class="stat-v">${S.orders.length}</div><div class="stat-l">Orders</div></div>
+    <div class="stat"><div class="stat-v">${S.prods.length}</div><div class="stat-l">Products</div></div>
+    <div class="stat"><div class="stat-v">${S.orders.filter(o=>o.status==='pending').length}</div><div class="stat-l">Pending</div></div>`;
+  $('aDashOrd').innerHTML=S.orders.slice(0,4).map(o=>`<div class="arow"><div><b style="font-size:.8rem">#${o.id} — ${o.name}</b><br><span style="font-size:.68rem;color:var(--muted)">${o.date} • ${fmt(o.total)}</span></div><select class="asel" onchange="updOS('${o.id}',this.value)">${['pending','processing','shipped','delivered'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}</select></div>`).join('')||'<div style="padding:12px;color:var(--muted);font-size:.8rem;text-align:center">No orders yet</div>';
+  const low=S.prods.filter(p=>p.stock<=8);
+  $('aDashStock').innerHTML=low.map(p=>`<div class="arow"><span>${p.em} ${p.name}</span><span style="color:var(--red);font-weight:700">${p.stock} units left</span></div>`).join('')||'<div style="padding:12px;color:var(--green);font-size:.8rem">✅ All stock levels OK</div>';
+}
+
+// Product image upload
+function handlePImgs(e){
+  Array.from(e.target.files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{S.pendImgs.push(ev.target.result);renderUpThumbs();};
+    r.readAsDataURL(f);
+  });
+}
+function renderUpThumbs(){
+  $('upThumbs').innerHTML=S.pendImgs.map((img,i)=>`<div class="uth"><img src="${img}"><button class="uth-del" onclick="delUpImg(${i})">×</button></div>`).join('');
+}
+function delUpImg(i){S.pendImgs.splice(i,1);renderUpThumbs();}
+
+function adminAddProd(){
+  const n=$('apN').value.trim(),pr=+$('apPr').value,mr=+$('apMr').value;
+  if(!n||!pr||!mr){toast('⚠️ Please fill required fields (*)');return;}
+  const newProd = {
+    id:Date.now(),name:n,brand:$('apBr').value||'Naari Fashion',
+    cat:$('apCat').value,price:pr,mrp:mr,stock:+$('apSt').value||10,
+    desc:$('apDs').value,em:$('apEm').value||'🛍️',
+    imgs:[...S.pendImgs],isNew:true,rating:0,reviews:0
+  };
+  S.prods.unshift(newProd);
+  S.pendImgs=[];renderUpThumbs();$('pImgInp').value='';
+  ['apN','apBr','apPr','apMr','apSt','apDs','apEm'].forEach(id=>{const el=$(id);if(el)el.value='';});
+  toast('✅ Product uploaded successfully!',2500);renderAPList();renderProds();
+  // Save to Firebase
+  saveProduct(newProd);
+}
+function renderAPList(){
+  $('aPCnt').textContent=`(${S.prods.length})`;
+  $('aPList').innerHTML=S.prods.map(p=>{
+    const mi=p.imgs&&p.imgs[0];
+    return `<div class="arow" style="flex-direction:column;align-items:flex-start;padding:10px 12px;gap:8px">
+      <div style="display:flex;gap:9px;align-items:center;width:100%">
+        <div style="width:44px;height:54px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:1.3rem">
+          ${mi?`<img src="${mi}" style="width:100%;height:100%;object-fit:cover">`:`${p.em}`}
+        </div>
+        <div style="flex:1"><div style="font-weight:700;font-size:.8rem">${p.name}</div><div style="font-size:.68rem;color:var(--muted)">${cEm(p.cat)} ${cLbl(p.cat)} • Stock: ${p.stock} • ${fmt(p.price)}</div></div>
+        <button onclick="delProd(${p.id})" style="background:none;border:none;color:var(--muted);font-size:.9rem;cursor:pointer;flex-shrink:0">🗑️</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%;align-items:center">
+        <label style="font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:3px">Price ₹<input type="number" value="${p.price}" style="width:65px;padding:4px 7px;border:1px solid var(--border);border-radius:5px;font-size:.73rem" onchange="updPr(${p.id},this.value)"></label>
+        <label style="font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:3px">Stock<input type="number" value="${p.stock}" style="width:54px;padding:4px 7px;border:1px solid var(--border);border-radius:5px;font-size:.73rem" onchange="updSt(${p.id},this.value)"></label>
+        <label style="font-size:.68rem;color:var(--red);cursor:pointer;border:1px solid var(--red);border-radius:5px;padding:4px 9px;display:flex;align-items:center;gap:3px">📷 Add Photos<input type="file" accept="image/*" multiple style="display:none" onchange="addPImgs(${p.id},event)"></label>
+      </div>
+      ${p.imgs&&p.imgs.length?`<div style="display:flex;gap:5px;flex-wrap:wrap">${p.imgs.map((img2,ii)=>`<div style="width:40px;height:50px;border-radius:5px;overflow:hidden;position:relative;border:1px solid var(--border)"><img src="${img2}" style="width:100%;height:100%;object-fit:cover"><button onclick="remPImg(${p.id},${ii})" style="position:absolute;top:1px;right:1px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;width:14px;height:14px;font-size:.48rem;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button></div>`).join('')}</div>`:''}
+    </div>`;
+  }).join('')||'<div style="padding:14px;text-align:center;color:var(--muted);font-size:.8rem">No products yet</div>';
+}
+function addPImgs(id,e){
+  const p=S.prods.find(x=>x.id===id);if(!p)return;
+  if(!p.imgs)p.imgs=[];let cnt=0;
+  Array.from(e.target.files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{p.imgs.push(ev.target.result);cnt++;if(cnt===e.target.files.length){renderAPList();renderProds();toast(`✅ ${cnt} photo(s) added!`);}};
+    r.readAsDataURL(f);
+  });
+}
+function remPImg(id,idx){const p=S.prods.find(x=>x.id===id);if(p&&p.imgs){p.imgs.splice(idx,1);renderAPList();renderProds();}}
+function delProd(id){S.prods=S.prods.filter(p=>p.id!==id);renderAPList();renderProds();toast('Product deleted');}
+function updPr(id,v){const p=S.prods.find(x=>x.id===id);if(p){p.price=+v;renderProds();}}
+function updSt(id,v){const p=S.prods.find(x=>x.id===id);if(p){p.stock=+v;updDash();}}
+
+function renderAOrders(){
+  $('aOrdList').innerHTML=S.orders.length?S.orders.map(o=>`
+    <div class="arow" style="flex-direction:column;align-items:flex-start;padding:10px 12px;gap:5px">
+      <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+        <div><b style="font-size:.8rem">#${o.id} — ${o.name}</b><br><span style="font-size:.68rem;color:var(--muted)">${o.date} • ${fmt(o.total)} • 📱 ${o.phone}</span></div>
+      </div>
+      <div style="font-size:.7rem;color:var(--muted)">📍 ${o.addr}</div>
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="font-size:.7rem;color:var(--muted)">Status:</span>
+        <select class="asel" onchange="updOS('${o.id}',this.value)">${['pending','processing','shipped','delivered'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}</select>
+      </div>
+    </div>`).join(''):'<div style="padding:14px;text-align:center;color:var(--muted);font-size:.8rem">No orders yet</div>';
+}
+function updOS(id,status){
+  const o=S.orders.find(x=>x.id===id);if(!o)return;
+  o.status=status;
+  const sl=['pending','processing','shipped','delivered'],i=sl.indexOf(status);
+  o.steps=sl.map((_,j)=>j<=i);
+  toast('✅ Order status updated');
+}
+
+// Banner upload
+function buildBanUpList(){
+  const el=$('banUpList');if(!el)return;
+  el.innerHTML=S.banners.map((b,i)=>`
+    <div style="margin-bottom:14px">
+      <div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Banner ${i+1}</div>
+      <div class="squpz" id="sq${i}">
+        <input type="file" accept="image/*" onchange="handleBanImg(${i},event)">
+        ${b.img?`<img src="${b.img}">`:''}
+        <div class="sq-overlay" ${b.img?'style="opacity:0.6"':''}>
+          <span class="sq-ico">${b.img?'✏️':'📷'}</span>
+          <span class="sq-t">${b.img?'Click to change image':'Upload banner image'}</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div class="fg"><label>Title</label><input value="${b.title}" onchange="S.banners[${i}].title=this.value;if(S.user)buildBanners()" placeholder="MIN. 60% OFF"></div>
+        <div class="fg"><label>Sub Text</label><input value="${b.sub}" onchange="S.banners[${i}].sub=this.value;if(S.user)buildBanners()" placeholder="Offer text"></div>
+      </div>
+      <div class="fg"><label>Button Text</label><input value="${b.badge}" onchange="S.banners[${i}].badge=this.value;if(S.user)buildBanners()" placeholder="Shop Now"></div>
+    </div>`).join('');
+}
+function handleBanImg(idx,e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    S.banners[idx].img=ev.target.result;
+    if(S.user)buildBanners();
+    buildBanUpList();
+    toast(`✅ Banner ${idx+1} updated!`);
+  };
+  r.readAsDataURL(f);
+}
+function addBannerSlot(){
+  S.banners.push({img:null,title:'New Offer',sub:'Special Sale',badge:'Shop Now',bg:'linear-gradient(135deg,#1a1a1a,#3d1515)',em:'🛍️',brands:[]});
+  buildBanUpList();
+  if(S.user)buildBanners();
+  toast('✅ New banner slot added!');
+}
+
+// Circle images
+function buildCiruRow(){
+  const el=$('ciruRow');if(!el)return;
+  el.innerHTML=CATS.map(c=>`
+    <div class="ciru">
+      <div class="ciru-ring">
+        <input type="file" accept="image/*" onchange="handleCiruImg('${c.id}',event)">
+        ${S.cImgs[c.id]?`<img src="${S.cImgs[c.id]}" alt="${c.lbl}">`:`${c.em}`}
+      </div>
+      <div class="ciru-lbl">${c.lbl}</div>
+    </div>`).join('');
+}
+function handleCiruImg(cat,e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{S.cImgs[cat]=ev.target.result;if(S.user)buildCircles();buildCiruRow();toast(`✅ ${cLbl(cat)} circle image updated!`);};
+  r.readAsDataURL(f);
+}
+
+// Brand card uploads
+function buildBcuGrid(){
+  const el=$('bcuGrid');if(!el)return;
+  el.innerHTML=S.brands.map((b,i)=>`
+    <div class="bcu">
+      <input type="file" accept="image/*" onchange="handleBcuImg(${i},event)">
+      ${b.img?`<img src="${b.img}" alt="">`:`<div class="bcu-fall">${b.em}</div>`}
+      <div class="bcu-b">
+        <input class="bcu-in" value="${b.title}" onchange="S.brands[${i}].title=this.value;if(S.user)buildBrands()" placeholder="Card Title">
+        <input class="bcu-in" value="${b.brand}" onchange="S.brands[${i}].brand=this.value;if(S.user)buildBrands()" placeholder="Brand Name">
+        <input class="bcu-in" value="${b.sub}" onchange="S.brands[${i}].sub=this.value;if(S.user)buildBrands()" placeholder="Subtitle" style="margin-bottom:0">
+      </div>
+    </div>`).join('');
+}
+function handleBcuImg(i,e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{S.brands[i].img=ev.target.result;if(S.user)buildBrands();buildBcuGrid();toast(`✅ Brand card ${i+1} updated!`);};
+  r.readAsDataURL(f);
+}
+
+// Coupons
+function adminAddCoupon(){
+  const c=$('ofC').value.toUpperCase().trim(),d=+$('ofD').value,m=+$('ofM').value||0;
+  if(!c||!d){toast('⚠️ Code and discount required');return;}
+  if(S.coupons.find(x=>x.code===c)){toast('⚠️ Coupon code already exists');return;}
+  S.coupons.push({code:c,disc:d,min:m});
+  $('ofC').value='';$('ofD').value='';$('ofM').value='';
+  renderACoupons();toast('✅ Coupon created!');
+  saveToFirebase('coupons', S.coupons);
+}
+function renderACoupons(){
+  $('aCoupList').innerHTML=S.coupons.map(c=>`<div class="arow"><div><b style="color:var(--red);font-size:.84rem">${c.code}</b><br><span style="font-size:.68rem;color:var(--muted)">${c.disc}% off • Min ${fmt(c.min)}</span></div><button onclick="delCoup('${c.code}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.88rem">🗑️</button></div>`).join('');
+}
+function delCoup(c){S.coupons=S.coupons.filter(x=>x.code!==c);renderACoupons();toast('Coupon deleted');saveToFirebase('coupons', S.coupons);}
+function renderAStock(){
+  $('aStockList').innerHTML=S.prods.map(p=>`<div class="arow" style="padding:9px 12px"><div style="display:flex;align-items:center;gap:8px"><span>${p.em}</span><div><div style="font-weight:600;font-size:.78rem">${p.name}</div><div style="font-size:.66rem;color:${p.stock<=8?'var(--red)':'var(--green)'}">${p.stock<=8?'⚠️ Low Stock':'✅ Good'}</div></div></div><div style="display:flex;align-items:center;gap:5px"><input type="number" value="${p.stock}" style="width:58px;padding:5px 7px;border:1.5px solid var(--border);border-radius:7px;font-size:.78rem;text-align:center" onchange="updSt(${p.id},this.value)"><span style="font-size:.66rem;color:var(--muted)">units</span></div></div>`).join('');
+}
+
+// Misc
+function openWA(){window.open('https://wa.me/919876543210?text=Hello! I need help with Naari Fashion.','_blank');}
+
+// ════════════════════════════════════════
+// FIREBASE SYNC FUNCTIONS
+// ════════════════════════════════════════
+
+// Save data to Firebase
+function saveToFirebase(path, data) {
+  db.ref(path).set(data)
+    .then(() => console.log('✅ Saved to Firebase:', path))
+    .catch(err => console.error('❌ Firebase Error:', err));
+}
+
+// Save single product
+function saveProduct(prod) {
+  db.ref('products/' + prod.id).set(prod)
+    .then(() => console.log('✅ Product saved'))
+    .catch(err => console.error('❌ Error:', err));
+}
+
+// Save order to Firebase
+function saveOrderToFirebase(order) {
+  const orderId = 'ORD' + Date.now();
+  order.id = orderId;
+  if(S.user && S.user.uid) order.userId = S.user.uid;
+  db.ref('orders/' + orderId).set(order)
+    .then(() => console.log('✅ Order saved:', orderId))
+    .catch(err => console.error('❌ Error:', err));
+  return orderId;
+}
+
+// Load products from Firebase
+function loadFromFirebase() {
+  // Load Products
+  db.ref('products').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      S.prods = Object.values(data);
+      renderProds();
+      renderAPList();
+      renderAStock();
+      console.log('✅ Products loaded from Firebase');
+    }
+  });
+
+  // Load Orders
+  db.ref('orders').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      S.orders = Object.values(data);
+      renderAOrders();
+      console.log('✅ Orders loaded from Firebase');
+    }
+  });
+
+  // Load Coupons
+  db.ref('coupons').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      S.coupons = data;
+      renderACoupons();
+    }
+  });
+}
+
+// Upload all products to Firebase (first time setup)
+function uploadAllProducts() {
+  S.prods.forEach(p => {
+    db.ref('products/' + p.id).set(p);
+  });
+  toast('✅ सगळे Products Firebase वर upload झाले!');
+}
+
+// Update adminAddProduct to save to Firebase
+const originalAddProduct = function(){
+  const n=$('apN').value.trim(),br=$('apBr').value.trim()||'Naari Fashion',
+        cat=$('apCat').value,pr=+$('apPr').value,mrp=+$('apMrp').value||pr,
+        stk=+$('apStk').value||10,desc=$('apDesc').value.trim()||'Beautiful fashion product from Naari.',
+        em=['🥻','👗','✨','☀️','🆕'][['saree','kurti','party','daily','new'].indexOf(cat)]||'👗';
+  if(!n||!pr){toast('⚠️ Name and price required');return;}
+  const id=Date.now();
+  const newProd = {id,name:n,brand:br,cat,price:pr,mrp,stock:stk,desc,em,imgs:S.pendImgs.slice(),isNew:true,rating:4.5,reviews:0};
+  S.prods.unshift(newProd);
+  S.pendImgs=[];
+  $('apN').value=$('apBr').value=$('apPr').value=$('apMrp').value=$('apStk').value=$('apDesc').value='';
+  $('imgPrevRow').innerHTML='';
+  renderAPList();renderProds();renderAStock();updDash();
+  toast('✅ Product added!');
+  // Save to Firebase
+  saveProduct(newProd);
+};
+
+
+// ═══════════════════════════════════════
+// FILTER SHEET
+// ═══════════════════════════════════════
+let activeMaxPrice = 999999;
+let activeCatFilter = 'all';
+
+function openFilterSheet(){
+  const sheet = document.getElementById('filterSheet');
+  if(sheet){ sheet.classList.add('open'); }
+}
+function closeFilterSheet(){
+  const sheet = document.getElementById('filterSheet');
+  if(sheet){ sheet.classList.remove('open'); }
+}
+function applyPriceFilter(min, max, btn){
+  activeMaxPrice = max;
+  document.querySelectorAll('#priceChips .pchip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  // Immediately show filtered products
+  renderProds();
+  // Also update budgetGrid if visible
+  const budgetGrid = document.getElementById('budgetGrid');
+  if(budgetGrid){
+    const bp = S.prods.filter(p => p.price <= 999);
+    budgetGrid.innerHTML = bp.length ? bp.map(pcHTML).join('') : '<div class="empty" style="grid-column:span 2"><div class="empty-ico">🔍</div><div class="empty-t">Under ₹999 मध्ये products नाहीत</div></div>';
+  }
+}
+function setCatFilter(cat, btn){
+  activeCatFilter = cat;
+  btn.closest('.price-chips').querySelectorAll('.pchip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  S.curCat = cat;
+  renderProds();
+  buildCircles();
+}
+
+// ═══════════════════════════════════════
+// BUDGET PANEL (Under ₹999)
+// ═══════════════════════════════════════
+// filterBudget moved below
+
+// ═══════════════════════════════════════
+// WALLET
+// ═══════════════════════════════════════
+function selectWalletAmt(amt, btn){
+  document.querySelectorAll('.wallet-amt-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ═══════════════════════════════════════
+// SUPPORT CHAT - USER SIDE
+// ═══════════════════════════════════════
+let supportChatId = null;
+
+function initSupportChat(){
+  // Show welcome even if not logged in
+  const box = document.getElementById('supportChatBox');
+  const loading = document.getElementById('suppLoading');
+  if(loading) loading.style.display = 'none';
+  
+  if(!S.user){
+    if(box) box.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:12px">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:30px;height:30px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div style="text-align:center">
+          <div style="font-weight:800;font-size:1rem;color:#333">Support Chat</div>
+          <div style="font-size:.82rem;color:#666;margin-top:6px;line-height:1.5">Chat करण्यासाठी पहिले<br><b>Login</b> करा</div>
+          <button onclick="showScr('scrAuth')" style="margin-top:14px;padding:10px 24px;background:var(--red);color:#fff;border:none;border-radius:22px;font-weight:700;font-size:.88rem;cursor:pointer">Login / Register</button>
+        </div>
+      </div>`;
+    return;
+  }
+  supportChatId = 'support_' + (S.user.phone || S.user.uid || 'user').replace(/[^a-zA-Z0-9_]/g,'_');
+  
+  // Set date chip
+  const dateEl = document.getElementById('suppDateChip');
+  if(dateEl) dateEl.textContent = new Date().toLocaleDateString('mr-IN', {day:'numeric',month:'long',year:'numeric'});
+  
+  // Remove old listener if any
+  if(window._suppListener){
+    db.ref('support/' + supportChatId + '/msgs').off('value', window._suppListener);
+  }
+  
+  // Real-time listener
+  window._suppListener = db.ref('support/' + supportChatId + '/msgs').on('value', snap => {
+    renderSupportChat(snap.val());
+  });
+  
+  // Admin online status
+  db.ref('support/' + supportChatId + '/adminOnline').on('value', snap => {
+    const el = document.getElementById('suppStatus');
+    if(el) el.textContent = snap.val() ? '🟢 Online' : 'Support Team';
+  });
+  
+  // Mark as read
+  db.ref('support/' + supportChatId + '/user').set({
+    name: S.user.name || 'User',
+    phone: S.user.phone || '',
+    lastTs: Date.now()
+  });
+}
+
+function leaveSupportChat(){
+  if(window._suppListener && supportChatId){
+    db.ref('support/' + supportChatId + '/msgs').off('value', window._suppListener);
+    window._suppListener = null;
+  }
+}
+
+function renderSupportChat(msgs){
+  const box = document.getElementById('supportChatBox');
+  const loading = document.getElementById('suppLoading');
+  if(!box) return;
+  if(loading) loading.style.display = 'none';
+  
+  if(!msgs || Object.keys(msgs).length === 0){
+    box.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;gap:10px">
+        <div style="width:60px;height:60px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:28px;height:28px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div style="text-align:center">
+          <div style="font-weight:700;font-size:.9rem;color:#333">Adinath (Support)</div>
+          <div style="font-size:.78rem;color:#666;margin-top:4px">नमस्कार! आपला प्रश्न किंवा समस्या लिहा.<br>+ बटण दाबून photo पण पाठवता येतो.</div>
+        </div>
+      </div>`;
+    return;
+  }
+  
+  const arr = Object.values(msgs).sort((a,b) => a.ts - b.ts);
+  box.innerHTML = arr.map(m => {
+    const isUser = m.sender === 'user';
+    const timeStr = m.timeStr || '';
+    
+    if(m.type === 'image'){
+      return `<div class="chat-bubble ${isUser?'user-bubble':'admin-bubble'}">
+        <div class="chat-img" onclick="openImgPreview('${m.img}')">
+          <img src="${m.img}" alt="Photo" loading="lazy">
+        </div>
+        <div class="chat-time">${isUser?'You':'Adinath'} · ${timeStr} ${isUser?'✓✓':''}</div>
+      </div>`;
+    }
+    if(m.type === 'file'){
+      return `<div class="chat-bubble ${isUser?'user-bubble':'admin-bubble'}">
+        <div class="chat-txt">
+          <div class="chat-file-msg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span style="font-size:.8rem">${m.fileName||'File'}</span>
+          </div>
+        </div>
+        <div class="chat-time">${isUser?'You':'Adinath'} · ${timeStr}</div>
+      </div>`;
+    }
+    return `<div class="chat-bubble ${isUser?'user-bubble':'admin-bubble'}">
+      <div class="chat-txt">${escapeHtml(m.text||'')}</div>
+      <div class="chat-time">${isUser?'You':'Adinath'} · ${timeStr} ${isUser?'✓✓':''}</div>
+    </div>`;
+  }).join('');
+  
+  // Auto scroll to bottom
+  box.scrollTop = box.scrollHeight;
+}
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function sendSupportMsg(){
+  const inp = document.getElementById('suppMsgInp');
+  if(!inp || !inp.value.trim()) return;
+  if(!S.user){ toast('Login करा आधी'); return; }
+  if(!supportChatId) initSupportChat();
+  
+  const text = inp.value.trim();
+  inp.value = '';
+  inp.focus();
+  
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  const msgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+  
+  // Save user info
+  db.ref('support/' + supportChatId + '/user').update({
+    name: S.user.name || 'User',
+    phone: S.user.phone || '',
+    lastMsg: text.substring(0,50),
+    lastTs: Date.now(),
+    unread: true
+  });
+  
+  // Save message - this triggers the real-time listener
+  db.ref('support/' + supportChatId + '/msgs/' + msgId).set({
+    text, sender:'user', ts: Date.now(), timeStr, type:'text'
+  }).catch(e => { toast('Message पाठवता आला नाही'); console.error(e); });
+}
+
+function sendSupportFile(event){
+  if(!S.user){ toast('Login करा आधी'); return; }
+  if(!supportChatId) initSupportChat();
+  
+  const file = event.target.files[0];
+  if(!file) return;
+  event.target.value = ''; // reset
+  
+  const isImage = file.type.startsWith('image/');
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  
+  if(file.size > maxSize){ toast('File 5MB पेक्षा लहान असावी'); return; }
+  
+  toast('Uploading...');
+  
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = e.target.result;
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    const msgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+    
+    db.ref('support/' + supportChatId + '/user').update({
+      name: S.user.name||'User', phone: S.user.phone||'',
+      lastMsg: isImage ? '[📷 Photo]' : '[📎 ' + file.name + ']',
+      lastTs: Date.now(), unread: true
+    });
+    
+    const msgData = isImage
+      ? { img: data, sender:'user', ts: Date.now(), timeStr, type:'image' }
+      : { img: data, fileName: file.name, sender:'user', ts: Date.now(), timeStr, type:'file' };
+    
+    db.ref('support/' + supportChatId + '/msgs/' + msgId).set(msgData)
+      .then(()=>{ toast(isImage ? '📷 Photo पाठवला!' : '📎 File पाठवली!'); })
+      .catch(e => { toast('Upload failed - file too large असेल'); console.error(e); });
+  };
+  reader.readAsDataURL(file);
+}
+
+function openImgPreview(src){
+  const overlay = document.createElement('div');
+  overlay.className = 'chat-img-preview';
+  overlay.innerHTML = `<img src="${src}"><button onclick="this.parentElement.remove()">बंद करा ✕</button>`;
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+// ═══════════════════════════════════════
+// ADMIN SUPPORT CHAT
+// ═══════════════════════════════════════
+let currentAdminChatId = null;
+
+function loadAdminChats(){
+  db.ref('support').once('value', snap => {
+    const data = snap.val();
+    const listEl = document.getElementById('chatUserList');
+    const noChatEl = document.getElementById('noChatMsg');
+    if(!listEl) return;
+    if(!data || Object.keys(data).length === 0){
+      listEl.innerHTML = '';
+      if(noChatEl) noChatEl.style.display = 'block';
+      return;
+    }
+    if(noChatEl) noChatEl.style.display = 'none';
+    const chats = Object.entries(data).map(([id, val]) => ({id, ...val}));
+    chats.sort((a,b) => (b.user?.lastTs||0) - (a.user?.lastTs||0));
+    listEl.innerHTML = chats.map(c => `
+      <button onclick="openAdminChat('${c.id}','${(c.user?.name||'User').replace(/'/g,"\'")}','${c.user?.phone||''}')"
+        style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid var(--border);border-radius:10px;cursor:pointer;text-align:left;width:100%;font-family:inherit">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--red),#c0254a);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:18px;height:18px"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:.85rem">${c.user?.name||'User'}</div>
+          <div style="font-size:.72rem;color:var(--muted)">${c.user?.phone||''} · ${c.user?.lastMsg||''}</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" style="width:16px;height:16px;flex-shrink:0"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    `).join('');
+  });
+}
+
+function openAdminChat(chatId, name, phone){
+  // Remove old listener
+  if(window._adminChatListener && currentAdminChatId){
+    db.ref('support/' + currentAdminChatId + '/msgs').off('value', window._adminChatListener);
+  }
+  
+  currentAdminChatId = chatId;
+  const area = document.getElementById('adminChatArea');
+  const nameEl = document.getElementById('chatUserName');
+  const phoneEl = document.getElementById('chatUserPhone');
+  const noChatEl = document.getElementById('noChatMsg');
+  const listEl = document.getElementById('chatUserList');
+  if(area){ area.style.display = 'block'; }
+  if(noChatEl) noChatEl.style.display = 'none';
+  if(listEl) listEl.style.display = 'none';
+  if(nameEl) nameEl.textContent = name;
+  if(phoneEl) phoneEl.textContent = phone;
+  
+  // Mark admin online for this user
+  db.ref('support/' + chatId + '/adminOnline').set(true);
+  
+  // Real-time listener
+  window._adminChatListener = db.ref('support/' + chatId + '/msgs').on('value', snap => {
+    renderAdminChat(snap.val());
+    // Mark unread as false
+    db.ref('support/' + chatId + '/user/unread').set(false);
+  });
+}
+
+function renderAdminChat(msgs){
+  const box = document.getElementById('adminChatMsgs');
+  if(!box) return;
+  if(!msgs || Object.keys(msgs).length === 0){
+    box.innerHTML = '<div style="text-align:center;padding:20px;color:#888;font-size:.82rem">अजून messages नाहीत</div>';
+    return;
+  }
+  const arr = Object.values(msgs).sort((a,b) => a.ts - b.ts);
+  box.innerHTML = arr.map(m => {
+    const isAdmin = m.sender === 'admin';
+    const timeStr = m.timeStr || '';
+    if(m.type === 'image'){
+      return `<div class="chat-bubble ${isAdmin?'user-bubble':'admin-bubble'}">
+        <div class="chat-img" onclick="openImgPreview('${m.img}')">
+          <img src="${m.img}" style="max-width:200px;border-radius:12px;cursor:pointer" loading="lazy">
+        </div>
+        <div class="chat-time">${isAdmin?'You (Adinath)':'User'} · ${timeStr}</div>
+      </div>`;
+    }
+    return `<div class="chat-bubble ${isAdmin?'user-bubble':'admin-bubble'}">
+      <div class="chat-txt">${m.text||''}</div>
+      <div class="chat-time">${isAdmin?'You (Adinath)':'User'} · ${timeStr}</div>
+    </div>`;
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function sendAdminReply(){
+  const inp = document.getElementById('adminReplyInp');
+  if(!inp || !inp.value.trim() || !currentAdminChatId) return;
+  const text = inp.value.trim();
+  inp.value = '';
+  inp.focus();
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  const msgId = 'msg_' + Date.now() + '_adm';
+  db.ref('support/' + currentAdminChatId + '/msgs/' + msgId).set({
+    text, sender:'admin', ts: Date.now(), timeStr, type:'text'
+  }).then(()=>{
+    // Update user's last message
+    db.ref('support/' + currentAdminChatId + '/user').update({
+      lastAdminMsg: text.substring(0,50),
+      lastAdminTs: Date.now()
+    });
+  }).catch(e => toast('Reply failed'));
+}
+
+// ═══════════════════════════════════════
+// NAV LABEL UPDATE
+// ═══════════════════════════════════════
+function updateNavLabel(tabIdx, label){
+  const bns = document.querySelectorAll('#mainBnav .bn');
+  if(bns[tabIdx-1]){
+    const lbl = bns[tabIdx-1].querySelector('.lbl');
+    if(lbl) lbl.textContent = label;
+  }
+}
+
+// Support screen open from profile
+document.addEventListener('DOMContentLoaded', ()=>{
+  // nothing needed - initSupportChat called on login
+});
+
+
+// ═══════════════════════════════════════
+// FILTER - APPLY & SHOW
+// ═══════════════════════════════════════
+function applyFilterAndShow(){
+  closeFilterSheet();
+  renderProds();
+  // Flash a toast showing active filter
+  if(activeMaxPrice < 999999){
+    toast('Filter: ₹' + activeMaxPrice.toLocaleString('en-IN') + ' पर्यंत products दाखवत आहे');
+  } else {
+    toast('सर्व products दाखवत आहे');
+  }
+  // Scroll to top
+  const panel = document.getElementById('mainPanel');
+  if(panel) panel.scrollTop = 0;
+  showPanel('pHome');
+}
+
+// ═══════════════════════════════════════
+// BIG SALE - USER SIDE
+// ═══════════════════════════════════════
+function loadBigSale(){
+  // Load banners from firebase
+  db.ref('bigSale/banners').once('value', snap => {
+    const banners = snap.val();
+    const banEl = document.getElementById('bigSaleBanners');
+    if(banEl && banners){
+      const arr = Array.isArray(banners) ? banners : Object.values(banners);
+      banEl.innerHTML = arr.map(img => `
+        <div style="margin:8px 10px 4px;border-radius:16px;overflow:hidden;border:3px solid transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#ff6b00,#ffb347,#ff6b00) border-box;box-shadow:0 4px 18px rgba(255,107,0,.3)">
+          <img src="${img}" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block">
+        </div>`).join('');
+    }
+  });
+  // Load sale products
+  db.ref('bigSale/prods').once('value', snap => {
+    const saleIds = snap.val();
+    const grid = document.getElementById('bigSaleGrid');
+    if(!grid) return;
+    let prods = S.prods;
+    if(saleIds && Object.keys(saleIds).length > 0){
+      const idArr = Object.values(saleIds).filter(Boolean);
+      if(idArr.length > 0){
+        prods = S.prods.filter(p => idArr.includes(p.id));
+      }
+    }
+    grid.innerHTML = prods.length ? prods.map(pcHTML).join('') : '<div class="empty" style="grid-column:span 2"><div class="empty-ico">🏷️</div><div class="empty-t">Sale Products coming soon!</div></div>';
+  });
+}
+
+// ═══════════════════════════════════════
+// BIG SALE - ADMIN SIDE
+// ═══════════════════════════════════════
+let saleBannerData = [];
+let saleProdIds = new Set();
+
+function uploadSaleBanners(event){
+  const files = Array.from(event.target.files);
+  const preview = document.getElementById('saleBanPreview');
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      saleBannerData.push(e.target.result);
+      if(preview){
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.cssText = 'width:80px;height:50px;object-fit:cover;border-radius:6px;border:1px solid var(--border)';
+        const wrap = document.createElement('div');
+        wrap.style.position = 'relative';
+        const del = document.createElement('button');
+        del.textContent = '×';
+        del.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0';
+        del.onclick = () => { wrap.remove(); saleBannerData = saleBannerData.filter(d=>d!==e.target.result); };
+        wrap.appendChild(img);
+        wrap.appendChild(del);
+        preview.appendChild(wrap);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function saveSaleBanners(){
+  if(saleBannerData.length === 0){ toast('पहिले banner upload करा'); return; }
+  db.ref('bigSale/banners').set(saleBannerData).then(()=>{
+    toast('✅ Sale banners saved!');
+  });
+}
+
+function renderBigSaleAdmin(){
+  // Load existing sale prod selections
+  db.ref('bigSale/prods').once('value', snap => {
+    const saved = snap.val();
+    saleProdIds = new Set(saved ? Object.values(saved).filter(Boolean) : []);
+    buildSaleProdList();
+  });
+  // Load existing banners
+  db.ref('bigSale/banners').once('value', snap => {
+    const banners = snap.val();
+    const preview = document.getElementById('saleBanPreview');
+    if(preview && banners){
+      const arr = Array.isArray(banners) ? banners : Object.values(banners);
+      saleBannerData = arr;
+      preview.innerHTML = arr.map((img,i) => `
+        <div style="position:relative">
+          <img src="${img}" style="width:80px;height:50px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+          <button onclick="removeSaleBanner(${i})" style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:.7rem;cursor:pointer;padding:0">×</button>
+        </div>`).join('');
+    }
+  });
+}
+
+function removeSaleBanner(idx){
+  saleBannerData.splice(idx,1);
+  renderBigSaleAdmin();
+  saveSaleBanners();
+}
+
+function buildSaleProdList(){
+  const el = document.getElementById('saleProdList');
+  if(!el) return;
+  el.innerHTML = S.prods.map(p => `
+    <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border-radius:8px;border:1px solid ${saleProdIds.has(p.id)?'var(--red)':'var(--border)'};cursor:pointer;transition:all .15s">
+      <input type="checkbox" ${saleProdIds.has(p.id)?'checked':''} onchange="toggleSaleProd(${p.id},this.checked)" style="width:18px;height:18px;accent-color:var(--red);flex-shrink:0">
+      <div style="flex:1">
+        <div style="font-size:.82rem;font-weight:600">${p.name}</div>
+        <div style="font-size:.7rem;color:var(--muted)">₹${p.price} · ${p.cat}</div>
+      </div>
+      ${saleProdIds.has(p.id)?'<span style="font-size:.65rem;background:var(--red);color:#fff;padding:2px 7px;border-radius:3px;font-weight:700">ADDED</span>':''}
+    </label>`).join('');
+}
+
+function toggleSaleProd(id, checked){
+  if(checked) saleProdIds.add(id);
+  else saleProdIds.delete(id);
+  // Save to firebase
+  const obj = {};
+  saleProdIds.forEach((id,i) => { obj['p'+i] = id; });
+  db.ref('bigSale/prods').set(obj).then(()=>{
+    buildSaleProdList();
+    toast(checked ? '✅ Product sale मध्ये add केला' : 'Product remove केला');
+  });
+}
+
+function toggleAllSaleProds(addAll){
+  if(addAll){
+    S.prods.forEach(p => saleProdIds.add(p.id));
+  } else {
+    saleProdIds.clear();
+  }
+  const obj = {};
+  saleProdIds.forEach((id,i) => { obj['p'+i] = id; });
+  db.ref('bigSale/prods').set(addAll ? obj : null).then(()=>{
+    buildSaleProdList();
+    toast(addAll ? '✅ सर्व products sale मध्ये add!' : 'सर्व products remove!');
+  });
+}
+
+// ═══════════════════════════════════════
+// UNDER ₹999 - Auto show from products
+// ═══════════════════════════════════════
+function filterBudget(){
+  // showPanel is handled by navTo() - just fill the grid
+  const grid = document.getElementById('budgetGrid');
+  if(!grid) return;
+  
+  // Wait a tick to ensure S.prods is loaded from Firebase
+  setTimeout(()=>{
+    const filtered = S.prods.filter(p => p.price <= 999);
+    if(filtered.length === 0){
+      grid.innerHTML = `
+        <div style="grid-column:span 2;text-align:center;padding:40px 20px">
+          <div style="font-size:3rem;margin-bottom:10px">🛍️</div>
+          <div style="font-weight:700;font-size:.95rem;color:#333;margin-bottom:6px">Under ₹999 Products</div>
+          <div style="font-size:.8rem;color:#888;line-height:1.5">अजून products add झाले नाहीत.<br>Admin panel मधून products add करा.</div>
+        </div>`;
+    } else {
+      grid.innerHTML = filtered.map(pcHTML).join('');
+    }
+    // Scroll to top
+    const panel = document.getElementById('pBudget');
+    if(panel) panel.scrollTop = 0;
+  }, 100);
+}
+
+
+
+// ═══════════════════════════════════════
+// BIRTHDAY BLAST - Admin Edit
+// ═══════════════════════════════════════
+let blastBg = 'linear-gradient(135deg,#6b5ce7 0%,#8b7cf7 50%,#a78bfa 100%)';
+
+function selectBlastColor(bg, btn){
+  blastBg = bg;
+  document.querySelectorAll('.blast-color').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function previewBlast(){
+  // Live preview in user profile
+  const t = document.getElementById('bblastTitleInp');
+  const s = document.getElementById('bblastSubInp');
+  const o = document.getElementById('bblastOfferInp');
+  updateBlastUI(
+    t ? t.value : null,
+    s ? s.value : null,
+    o ? o.value : null,
+    blastBg
+  );
+}
+
+function updateBlastUI(title, subtitle, offer, bg){
+  const card = document.getElementById('birthdayBlastCard');
+  const tEl = document.getElementById('bblastTitle');
+  const sEl = document.getElementById('bblastSubtitle');
+  const oEl = document.getElementById('bblastOffer');
+  if(tEl && title) tEl.innerHTML = title;
+  if(sEl && subtitle) sEl.textContent = subtitle;
+  if(oEl && offer) oEl.textContent = offer;
+  if(card && bg) card.style.background = bg;
+}
+
+function saveBirthdayBlast(){
+  const title = document.getElementById('bblastTitleInp') ? document.getElementById('bblastTitleInp').value.trim() : '';
+  const subtitle = document.getElementById('bblastSubInp') ? document.getElementById('bblastSubInp').value.trim() : '';
+  const offer = document.getElementById('bblastOfferInp') ? document.getElementById('bblastOfferInp').value.trim() : '';
+  const data = {
+    title: title || '🎂 BIRTHDAY BLAST',
+    subtitle: subtitle || 'WISHLIST NOW! SALE STARTS ON',
+    offer: offer || '50-90% OFF • FEB 28',
+    bg: blastBg
+  };
+  db.ref('settings/birthdayBlast').set(data).then(()=>{
+    toast('✅ Birthday Blast updated!');
+    updateBlastUI(data.title, data.subtitle, data.offer, data.bg);
+  });
+}
+
+function loadBirthdayBlast(){
+  db.ref('settings/birthdayBlast').once('value', snap => {
+    const d = snap.val();
+    if(d){
+      updateBlastUI(d.title, d.subtitle, d.offer, d.bg);
+      // Fill admin form if open
+      const t = document.getElementById('bblastTitleInp');
+      const s = document.getElementById('bblastSubInp');
+      const o = document.getElementById('bblastOfferInp');
+      if(t) t.value = d.title;
+      if(s) s.value = d.subtitle;
+      if(o) o.value = d.offer;
+      if(d.bg) blastBg = d.bg;
+    }
+  });
+}
+
+// ═══════════════════════════════════════
+// HELP CENTER - Admin edit + User open
+// ═══════════════════════════════════════
+function saveHelpCenter(){
+  const num = document.getElementById('helpCenterNum') ? document.getElementById('helpCenterNum').value.trim() : '';
+  const txt = document.getElementById('helpCenterTxt') ? document.getElementById('helpCenterTxt').value.trim() : '';
+  if(!num){ toast('Number टाका'); return; }
+  db.ref('settings/helpCenter').set({ num, txt: txt || 'आम्हाला WhatsApp करा' }).then(()=>{
+    toast('✅ Help Center number saved!');
+  });
+}
+
+function openHelpCenter(){
+  db.ref('settings/helpCenter').once('value', snap => {
+    const d = snap.val();
+    if(d && d.num){
+      const msg = encodeURIComponent('Hello Naari Fashion! मला help हवी आहे.');
+      window.open('https://wa.me/91' + d.num.replace(/\D/g,'') + '?text=' + msg, '_blank');
+    } else {
+      toast('Help Center: लवकरच उपलब्ध होईल');
+    }
+  });
+}
+
+function loadHelpCenterAdmin(){
+  db.ref('settings/helpCenter').once('value', snap => {
+    const d = snap.val();
+    if(d){
+      const n = document.getElementById('helpCenterNum');
+      const t = document.getElementById('helpCenterTxt');
+      if(n) n.value = d.num || '';
+      if(t) t.value = d.txt || '';
+    }
+  });
+}
+
+
+// Init - Load from Firebase and build UI
+loadFromFirebase();
+buildBanners();
+loadBirthdayBlast();
+</script>
+</body>
+</html>
